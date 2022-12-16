@@ -1,5 +1,5 @@
-import { Box, ButtonBase, Link, Paper, Typography } from "@mui/material";
-import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
+import { Box, ButtonBase, Paper, Typography } from "@mui/material";
+import { useNavigate } from 'react-router-dom';
 
 function BlogCategoryNavigateCardUnit({ categoryRecord }: {
     categoryRecord: CategoryRecord
@@ -16,12 +16,11 @@ function BlogCategoryNavigateCardUnit({ categoryRecord }: {
     >
         <Paper>
             <Box px={2} py={1}>
-                <Link
-                    component={ReactRouterLink}
-                    to={`/category/${encodeURI(categoryRecord.name)}`}
-                    variant="body1" underline="hover" fontWeight="bolder">
+                <Typography color="primary"
+                    variant="body1"
+                    fontWeight="bolder">
                     {`${categoryRecord.name} (${categoryRecord.postsCount})`}
-                </Link>
+                </Typography>
             </Box>
         </Paper>
 

@@ -17,7 +17,7 @@ function BlogChipNavigate({ tagList }: {
 }) {
     return <Box display='flex' flexWrap='wrap'>
 
-        {tagList.map((v, i) => <Box p={0.5} key={i}>
+        {tagList.map((v, i) => <Box pr={1} pb={1} key={i}>
             <NavigateChipUnit record={v} />
         </Box>)}
     </Box>

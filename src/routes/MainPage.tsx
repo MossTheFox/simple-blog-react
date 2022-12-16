@@ -3,6 +3,7 @@ import BlogCategoryNavigateCardUnit from "../ui/cards/BlogCategoryNavigateCardUn
 import BlogChipNavigate from "../ui/cards/BlogChipNavigate";
 import BlogSummaryCardMain from "../ui/cards/BlogSummaryCardMain";
 import MainBanner from "../ui/decorations/MainBanner";
+import { Outlet } from 'react-router-dom';
 import { blogCategoryListTestData, blogSummaryTestData, blogTagListTestData } from "../_testData";
 
 function MainPage() {
@@ -15,18 +16,21 @@ function MainPage() {
 
             {/* Contents */}
             <Grid container spacing={4}>
+                {/* 左栏: 近期文章 (所有文章 + 翻页) | 文章内容 | 按标签查找的文章 | 按作者查找的文章 | 按分类查找的文章 */}
                 <Grid item xs={12} sm={8}>
-                    <Typography variant="h5" fontWeight="bolder" gutterBottom
-                        sx={{
-                            textIndent: (theme) => theme.spacing(2),
-                        }}
-                    >
-                        近期文章
-                    </Typography>
-                    <Stack spacing={2}>
-                        <BlogSummaryCardMain blogSummaryData={blogSummaryTestData} />
-                        <BlogSummaryCardMain blogSummaryData={blogSummaryTestData} />
-                    </Stack>
+                    {Outlet({}) || (<>
+                        <Typography variant="h5" fontWeight="bolder" gutterBottom
+                            sx={{
+                                textIndent: (theme) => theme.spacing(2),
+                            }}
+                        >
+                            近期文章
+                        </Typography>
+                        <Stack spacing={2}>
+                            <BlogSummaryCardMain blogSummaryData={blogSummaryTestData} />
+                            <BlogSummaryCardMain blogSummaryData={blogSummaryTestData} />
+                        </Stack>
+                    </>)}
                 </Grid>
                 <Grid item xs={12} sm={4}>
                     <Typography variant="h5" fontWeight="bolder" gutterBottom

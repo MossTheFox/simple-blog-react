@@ -2,6 +2,7 @@ import { Box, CssBaseline } from "@mui/material";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import BlogPost from "./routes/blogPost/BlogPost";
 import MainPage from "./routes/MainPage";
 import NotFound from "./routes/NotFound";
 import MainContainer from "./ui/MainContainer";
@@ -14,25 +15,8 @@ const router = createBrowserRouter([
         errorElement: <NotFound />,
         children: [
             {
-                // profile page
-                path: 'my',
-                // elements TODO
-                children: [
-                    {
-                        path: 'editor',
-                        children: [
-                            {
-                                path: 'new'
-                            },
-                            {
-                                path: 'edit/:id'
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                path: 'blog/:id'
+                path: 'blog/:id',
+                element: <BlogPost />
             },
             {
                 path: 'author/:authorName'
@@ -42,6 +26,26 @@ const router = createBrowserRouter([
             },
             {
                 path: 'tag/:tagName'
+            }
+        ]
+    },
+    {
+        // profile page
+        path: '/my',
+        errorElement: <NotFound />,
+
+        // elements TODO
+        children: [
+            {
+                path: 'editor',
+                children: [
+                    {
+                        path: 'new'
+                    },
+                    {
+                        path: 'edit/:id'
+                    }
+                ]
             }
         ]
     },
