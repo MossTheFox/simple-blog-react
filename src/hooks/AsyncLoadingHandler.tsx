@@ -1,5 +1,5 @@
 import { Box, CircularProgress, Fade } from "@mui/material";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ErrorBox from "../ui/smallComponents/ErrorBox";
 import useAsync from "./useAsync";
 
@@ -54,12 +54,16 @@ function AsyncLoadingHandler<T>({
     }, []);
 
 
-    const fireOnce = useAsync(asyncFunc, asyncOnSuccess, asyncOnError, true);
+    const fireOnce = useAsync(asyncFunc, asyncOnSuccess, asyncOnError);
 
     const startFetch = useCallback(() => {
         setLoading(true);
         setError(null);
         setData(null);
+        fireOnce();
+    }, [fireOnce]);
+
+    useEffect(() => {
         fireOnce();
     }, [fireOnce]);
 
