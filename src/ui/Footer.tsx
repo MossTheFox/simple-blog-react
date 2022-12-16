@@ -11,7 +11,7 @@ function Footer() {
             textAlign="center"
         >
             <Stack spacing={0.5} pb={1} direction="row" alignItems="center">
-                <IconButton target="_blank" href="https://github.com/MossTheFox/"><GitHub /></IconButton>
+                <IconButton target="_blank" href="https://github.com/MossTheFox/simple-blog-react"><GitHub /></IconButton>
             </Stack>
             <Box pb={1}>
                 <Typography variant="body2" color="textSecondary">
