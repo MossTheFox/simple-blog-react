@@ -35,10 +35,12 @@ function BlogSummaryCardMain({ blogSummaryData }: {
                     <>
                         {' │ '}
                         🏷️ 标签: {blogSummaryData.tags.map((v, i) => (
-                            <Link component={ReactRouterLink} underline="hover"
-                                to={`/author/${encodeURI(v)}`}
-                                key={i}
-                            >{v + ' '}</Link>
+                            <span key={i}>
+                                <Link component={ReactRouterLink} underline="hover"
+                                    to={`/author/${encodeURI(v)}`}
+                                >{v}</Link>
+                                {' '}
+                            </span>
                         ))}
                     </>
                 )}
