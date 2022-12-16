@@ -70,7 +70,6 @@ export function markdownGetReactDOMs(md: string | marked.Token[]): (JSX.Element 
             case 'link':
                 return <Link key={i} href={v.href} target="_blank" underline='hover'>{children}</Link>;
             case 'list':
-                console.log(v);
                 if (v.ordered) {
                     return <ol start={v.start || 1} key={i}>{markdownGetReactDOMs(v.items)}</ol>;
                 }

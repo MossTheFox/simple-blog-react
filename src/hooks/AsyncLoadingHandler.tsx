@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import ErrorBox from "../ui/smallComponents/ErrorBox";
 import useAsync from "./useAsync";
 
-function TemplateLoadingPlaceHolder() {
+export function TemplateLoadingPlaceHolder() {
     return <Box display="block" textAlign="center">
         <Fade in style={{
             transitionDelay: '800ms'
@@ -13,7 +13,7 @@ function TemplateLoadingPlaceHolder() {
     </Box>;
 }
 
-function TemplateOnErrorRender({ title, message = '未知错误', retryFunc }: {
+export function TemplateOnErrorRender({ title, message = '未知错误', retryFunc }: {
     title?: string
     message?: string,
     retryFunc?: () => void
@@ -21,6 +21,15 @@ function TemplateOnErrorRender({ title, message = '未知错误', retryFunc }: {
     return <ErrorBox message={message} title={title || '出错了'} retryFunc={retryFunc} />
 }
 
+/**
+ * 需要异步加载、稍后显示的内容，借助这个套起来。
+ * 
+ * 适用于**不会需要在生命周期内发生刷新的组件**。(```asyncFunc``` 的变化不会触发 rerender.)
+ * 
+ * 必须的字段: ```asyncFunc``` 与 ```OnSuccessRender```。
+ * 
+ * 留意: render 相关的参数接受的是一个返回 JSX.Element 的**函数**。
+ */
 function AsyncLoadingHandler<T>({
     asyncFunc,
     LoadingPlaceholder = TemplateLoadingPlaceHolder,
