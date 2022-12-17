@@ -42,6 +42,7 @@ Ready to start writing?  Either start changing stuff on the left or
 export const blogSummaryTestData: BlogSummaryData = {
     id: 1,
     author: '孙笑川',
+    authorId: 1,
     category: '柠檬熟了',
     createdAt: new Date(),
     // lastModified: new Date(),
@@ -54,6 +55,7 @@ export const blogSummaryTestData: BlogSummaryData = {
 export const blogTestPostData: BlogPostData = {
     id: 1,
     author: '孙笑川',
+    authorId: 1,
     category: '柠檬熟了',
     createdAt: new Date(),
     lastModified: new Date(),

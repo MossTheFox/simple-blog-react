@@ -1,16 +1,21 @@
-import { Box, Pagination, Stack, Typography } from "@mui/material";
+import { Box, Collapse, Pagination, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useParams } from 'react-router-dom';
 import AsyncLoadingHandler, { TemplateLoadingPlaceHolder, TemplateOnErrorRender } from "../../hooks/AsyncLoadingHandler";
 import useAsync from "../../hooks/useAsync";
+import { APIService } from "../../scripts/dataAPIInterface";
 import BlogSummaryCardMain from "../../ui/cards/BlogSummaryCardMain";
 import { blogSummaryTestData } from "../../_testData";
 
-function MainArticleList({ query }: {
-    query?: {
-        author?: string;
-        tag?: string;
-        category?: string;
-    }
+type SearchQuery = {
+    author: string;
+    tag: string;
+    category: string;
+    searchText: string;
+};
+
+function MainArticleList({ mode }: {
+    mode?: 'all' | 'tag' | 'author' | 'category' | 'search'
 }) {
 
     const [totalArticlesCount, setTotalArticlesCount] = useState(1);
@@ -18,46 +23,41 @@ function MainArticleList({ query }: {
     const totalPage = useMemo(() => Math.ceil(totalArticlesCount / perPage), [totalArticlesCount]);
     const [page, setPage] = useState(1);
 
+    const { authorName, categoryName, tagName, searchText } = useParams();
+
+    const [searchQuery, setSearchQuery] = useState<null | Partial<SearchQuery>>(null);
+
     const title = useMemo(() => {
-        if (!query) return '所有文章';
-        if (query.author) return `作者: ${query.author}`;
-        if (query.tag) return `标签: ${query.tag}`;
-        if (query.category) return `分类: ${query.category}`;
-
-        return '所有文章';
-    }, [query]);
-
-    // 获取文章总数 (与获取文章列表不冲突，同步进行。默认拉取首页) (不刷新)
-    const asyncFetchPageCount = useCallback(() => {
-        return new Promise<number>((resolve, reject) => {
-            setTimeout(() => {
-                Math.random() > 0.1 ? resolve(55) : reject(new Error('模拟错误'))
-            }, 1000);
-        });
-    }, [query]);
+        switch (mode) {
+            case 'author':
+                return `作者: ${authorName}`;
+            case 'category':
+                return `分类: ${categoryName}`;
+            case 'tag':
+                return `标签: ${tagName}`;
+            case 'search':
+                return `搜索: ${searchText}`;
+            default:
+                return '所有文章';
+        }
+    }, [mode, authorName, categoryName, tagName, searchText]);
 
     const [articleList, setArticleList] = useState<BlogSummaryData[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    // 拉取文章列表 (会在生命周期内刷新)
-    const asyncFetchArticleList = useCallback(() => {
-        // fake loading
-        return new Promise<BlogSummaryData[]>((resolve, reject) => {
-            setTimeout(() => {
-                Math.random() > 0.1 ? resolve(new Array<BlogSummaryData>(10).fill(blogSummaryTestData)
-                    .map((v, i) => {
-                        return {
-                            ...v,
-                            title: v.title + ` ${page}, ${i}`
-                        }
-                    })) : reject(new Error('模拟错误'))
-            }, 1000);
+    // 拉取文章总数与列表 (会在组件生命周期内刷新)
+    const asyncFetchArticleList = useCallback(async () => {
+        return await APIService.getBlogSummaryList({
+            ...searchQuery,
+            perPage: perPage,
+            thisPage: page
         });
-    }, [page, query]);
+    }, [page, searchQuery, perPage]);
 
-    const fetchArticleListOnSuccess = useCallback((data: BlogSummaryData[]) => {
+    const fetchArticleListOnSuccess = useCallback(({ data, total }: { data: BlogSummaryData[], total: number }) => {
         setArticleList(data);
+        setTotalArticlesCount(total);
         setLoading(false);
         setError(null);
     }, []);
@@ -81,9 +81,29 @@ function MainArticleList({ query }: {
     }, [fireFetchPageRerender]);
 
     const pageChangeAction = useCallback((v: number) => {
+        if (v === page) return;
         setPage(v);
         fireFetchPageRerender();
-    }, [fireFetchPageRerender]);
+    }, [fireFetchPageRerender, page]);
+
+    // 接管页面变化
+    useEffect(() => {
+        switch (mode) {
+            case 'author':
+                setSearchQuery({ author: authorName });
+            case 'category':
+                setSearchQuery({ category: categoryName });
+            case 'tag':
+                setSearchQuery({ tag: tagName });
+            case 'search':
+                setSearchQuery({ searchText: searchText });
+            default:
+                setSearchQuery(null);
+        }
+        setPage(1);
+        fireFetchPageRerender();
+        // TODO: 刷新页码
+    }, [mode, authorName, categoryName, tagName, searchText]);
 
 
     return <>
@@ -95,7 +115,7 @@ function MainArticleList({ query }: {
             {title}
         </Typography>
 
-        <Stack spacing={2}>
+        <Stack spacing={2} pb={2}>
             {/* 生命周期内会发生变化的组件，不使用 AsyncLoadingHandler */}
             {loading ? (<TemplateLoadingPlaceHolder />) : (
                 error ? (
@@ -104,24 +124,15 @@ function MainArticleList({ query }: {
                     articleList.map((v, i) =>
                         <BlogSummaryCardMain key={i} blogSummaryData={v} />
                     )
+
                 )
             )}
         </Stack>
-
-        <AsyncLoadingHandler asyncFunc={asyncFetchPageCount}
-            OnSuccessRender={({ data }: { data: number }) => {
-                useEffect(() => {
-                    setTotalArticlesCount(data);
-                }, [data]);
-                return <>
-                    {totalPage > 1 && (
-                        <Box py={2} display='flex' alignItems='center' justifyContent='center'>
-                            <Pagination color="primary" count={totalPage} page={page} onChange={(_, page) => pageChangeAction(page)} />
-                        </Box>
-                    )}
-                </>
-            }}
-        />
+        {(totalPage > 1) && (
+            <Box py={2} display='flex' alignItems='center' justifyContent='center'>
+                <Pagination color="primary" count={totalPage} page={page} onChange={(_, page) => pageChangeAction(page)} />
+            </Box>
+        )}
     </>
 }
 

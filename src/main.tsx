@@ -2,6 +2,8 @@ import { Box, CssBaseline } from "@mui/material";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { UserContextProvider } from "./context/userContext";
+import MainArticleList from "./routes/articleList/MainArticleList";
 import BlogPost from "./routes/blogPost/BlogPost";
 import MainPage from "./routes/MainPage";
 import NotFound from "./routes/NotFound";
@@ -19,13 +21,20 @@ const router = createBrowserRouter([
                 element: <BlogPost />
             },
             {
-                path: 'author/:authorName'
+                path: 'author/:authorName',
+                element: <MainArticleList mode="author" />
             },
             {
-                path: 'category/:categoryName'
+                path: 'category/:categoryName',
+                element: <MainArticleList mode="category" />
             },
             {
-                path: 'tag/:tagName'
+                path: 'tag/:tagName',
+                element: <MainArticleList mode="tag" />
+            },
+            {
+                path: 'search/:searchText',
+                element: <MainArticleList mode="search" />
             }
         ]
     },
@@ -58,7 +67,9 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
             <MainContainer>
                 <Box minHeight={"100vh"}> {/* minHeight="calc(100vh - 10rem)" */}
                     {/* MAIN */}
-                    <RouterProvider router={router} />
+                    <UserContextProvider>
+                        <RouterProvider router={router} />
+                    </UserContextProvider>
                 </Box>
             </MainContainer>
         </WrappedThemeProvider>

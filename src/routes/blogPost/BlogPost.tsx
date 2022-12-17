@@ -3,9 +3,8 @@ import { Box, Button } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
 import AsyncLoadingHandler from "../../hooks/AsyncLoadingHandler";
+import { APIService } from "../../scripts/dataAPIInterface";
 import { markdownGetReactDOMs } from "../../utils/markdownTools";
-import { blogTestPostData } from "../../_testData";
-
 
 function BlogPostRender({ data }: { data: BlogPostData }) {
     return <>{markdownGetReactDOMs(data.content)}</>;
@@ -24,14 +23,11 @@ function BlogPost() {
         navigate('/');
     }, []);
 
-    const asyncGetBlogPostData = useCallback(() => {
+    const asyncGetBlogPostData = useCallback(async () => {
         // um
-        return new Promise<BlogPostData>((resolve, reject) => {
-            setTimeout(() => {
-                Math.random() > 0.2 ? resolve(blogTestPostData) : reject(new Error('模拟加载错误'));
-            }, 1000)
-        });
-    }, []);
+        if (!id || (Number.isNaN(+id))) throw new Error('无效的文章 ID。');
+        return await APIService.getBlogFullDataById(id);
+    }, [id]);
 
     return <Box>
         <Box pb={2}>

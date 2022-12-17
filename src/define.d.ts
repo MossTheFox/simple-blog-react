@@ -1,6 +1,7 @@
 type BlogPostData = {
     id: number;
     author: string;
+    authorId: number;
     summary: string;
     title: string;
     /** Markdown content */
@@ -16,6 +17,7 @@ type BlogPostData = {
 type BlogSummaryData = {
     id: number;
     author: string;
+    authorId: number;
     summary: string;
     title: string;
     category: string;
@@ -37,3 +39,17 @@ type TagRecord = {
 };
 
 type TagListData = TagRecord[];
+
+type BlogUserCore = {
+    id: number;
+    // 用户权限标记
+    flags: string[];
+};
+
+type BlogUserData = {
+    username: string;
+    avatar: string;
+    signature: string;
+};
+
+type BlogUserContext = 'Not Login' | (BlogUserCore & BlogUserData);

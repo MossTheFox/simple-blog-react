@@ -8,6 +8,9 @@ import { blogCategoryListTestData, blogSummaryTestData, blogTagListTestData } fr
 import { Folder, LocalOffer } from "@mui/icons-material";
 import NavBar from "../ui/NavBar";
 import MainArticleList from "./articleList/MainArticleList";
+import AsyncLoadingHandler from "../hooks/AsyncLoadingHandler";
+import { APIService } from "../scripts/dataAPIInterface";
+import UserSideCard from "../ui/cards/UserSideCard";
 
 function MainPage() {
     return <>
@@ -26,19 +29,28 @@ function MainPage() {
                     <Grid item xs={12} sm={8}>
                         {Outlet({}) || <MainArticleList />}
                     </Grid>
+
+                    {/* 右栏: 小型用户面板 + 分类 + 标签 */}
                     <Grid item xs={12} sm={4}>
+
+                        <UserSideCard />
+
                         <Box display="flex" alignItems="center" pb={1}>
                             <Folder fontSize="medium" sx={{ mr: 1 }} />
                             <Typography variant="h5" display="inline-block" fontWeight="bolder" alignContent="baseline">
                                 分类
                             </Typography>
                         </Box>
-                        <Stack spacing={1} marginBottom={2}>
-                            {blogCategoryListTestData.map((v, i) =>
-                                <BlogCategoryNavigateCardUnit key={i}
-                                    categoryRecord={v} />
-                            )}
-                        </Stack>
+
+                        <AsyncLoadingHandler asyncFunc={APIService.getBlogCategoryList}
+                            OnSuccessRender={({ data }) => {
+                                return <Stack spacing={1} marginBottom={2}>
+                                    {data.map((v, i) =>
+                                        <BlogCategoryNavigateCardUnit key={i}
+                                            categoryRecord={v} />
+                                    )}
+                                </Stack>
+                            }} />
 
                         <Box display="flex" alignItems="center" pb={1}>
                             <LocalOffer fontSize="medium" sx={{ mr: 1 }} />
@@ -47,7 +59,10 @@ function MainPage() {
                             </Typography>
                         </Box>
 
-                        <BlogChipNavigate tagList={blogTagListTestData} />
+                        <AsyncLoadingHandler asyncFunc={APIService.getBlogTagList}
+                            OnSuccessRender={({ data }) => {
+                                return <BlogChipNavigate tagList={data} />
+                            }} />
 
                     </Grid>
                 </Grid>
