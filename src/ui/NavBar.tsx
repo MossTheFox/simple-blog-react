@@ -1,13 +1,13 @@
 import { GitHub } from "@mui/icons-material";
-import { AppBar, Toolbar, Typography, Container, IconButton, Link } from "@mui/material";
+import { AppBar, Toolbar, Typography, Container, IconButton, Link, Breakpoint } from "@mui/material";
 import { Link as ReactRouterLink } from 'react-router-dom';
 
 
-function NavBar() {
+function NavBar({ maxWidth = 'lg', position = "sticky" }: { maxWidth?: Breakpoint, position?: "fixed" | "sticky" | "absolute" | "relative" | "static" | undefined }) {
 
     return (
-        <AppBar position="sticky" color="primary">
-            <Container maxWidth="lg">
+        <AppBar position={position} color="primary">
+            <Container maxWidth={maxWidth}>
                 <Toolbar>
                     <Typography variant="h6" component="div" fontWeight={"bolder"} sx={{ flexGrow: 1 }}>
                         <Link component={ReactRouterLink} to="/" color="inherit" underline="hover">

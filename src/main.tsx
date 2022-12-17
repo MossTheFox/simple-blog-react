@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { UserContextProvider } from "./context/userContext";
 import MainArticleList from "./routes/articleList/MainArticleList";
 import BlogPost from "./routes/blogPost/BlogPost";
+import BlogPostEditorPage from "./routes/editor/BlogPostEditorPage";
 import MainPage from "./routes/MainPage";
 import NotFound from "./routes/NotFound";
 import MainContainer from "./ui/MainContainer";
@@ -41,22 +42,18 @@ const router = createBrowserRouter([
     {
         // profile page
         path: '/my',
+        // element: 
         errorElement: <NotFound />,
-
-        // elements TODO
-        children: [
-            {
-                path: 'editor',
-                children: [
-                    {
-                        path: 'new'
-                    },
-                    {
-                        path: 'edit/:id'
-                    }
-                ]
-            }
-        ]
+    },
+    {
+        path: '/editor/new',
+        element: <BlogPostEditorPage mode='new' />,
+        errorElement: <NotFound />
+    },
+    {
+        path: '/editor/edit/:id',
+        element: <BlogPostEditorPage mode='edit' />,
+        errorElement: <NotFound />
     },
 ]);
 

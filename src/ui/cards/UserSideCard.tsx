@@ -40,7 +40,7 @@ function UserSideCard() {
         </>
             : <Stack spacing={2}>
                 <Button fullWidth startIcon={<BorderColor />} children="发布文章" variant="contained"
-                    onClick={() => navigate('/my/editor/new')}
+                    onClick={() => navigate('/editor/new')}
                 />
                 <Button fullWidth startIcon={<AccountCircle />} children="个人信息" variant="contained"
                     onClick={() => navigate('/my')}

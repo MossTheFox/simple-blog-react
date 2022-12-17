@@ -73,7 +73,7 @@ function UserLoginForm(props: BoxProps) {
                 <Typography variant="body2">{(!loading && err) ? err.message : ''}</Typography>
             </Stack>
         </form>
-        <Button variant="contained" fullWidth onClick={handleSubmit}>登录</Button>
+        <Button variant="contained" disabled={loading} fullWidth onClick={handleSubmit}>登录</Button>
     </Box>
 }
 

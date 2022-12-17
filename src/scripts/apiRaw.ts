@@ -12,7 +12,9 @@ const abortController = {
 
 
 export async function getServerStatus(signal = abortController.signal) {
-    let res = await fetch(`${API_URL}/status`);
+    let res = await fetch(`${API_URL}/status`, {
+        signal
+    });
     if (!res.ok) {
         throw new Error(res.statusText);
     }
