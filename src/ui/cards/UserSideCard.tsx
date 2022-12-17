@@ -43,6 +43,7 @@ function UserSideCard() {
                     onClick={() => navigate('/editor/new')}
                 />
                 <Button fullWidth startIcon={<AccountCircle />} children="个人信息" variant="contained"
+                    disabled    // TODO
                     onClick={() => navigate('/my')}
                 />
 

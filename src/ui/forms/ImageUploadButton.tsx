@@ -8,7 +8,9 @@ function ImageUploadButton(props: {
     const urlCallback = useMemo(() => props.urlCallback, [props.urlCallback]);
 
     return <>
-        <Button children="上传图片" variant="contained" startIcon={<InsertPhoto />} {...props} />
+        <Button children="上传图片" variant="contained" startIcon={<InsertPhoto />} {...props} 
+            disabled    // TODO
+        />
     </>
 }
 

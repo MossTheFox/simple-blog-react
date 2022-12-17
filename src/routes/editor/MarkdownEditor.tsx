@@ -46,7 +46,21 @@ function MarkdownEditor({ initialValue, updateCallback }: {
             <Box py={1}>
                 <ImageUploadButton children="插入图片" />
             </Box>
-            <Box maxHeight={'calc(100vh - 10rem)'} overflow="auto">
+        </Grid>
+
+        <Grid item xs={12} sm={enableRealtimePreview ? 6 : 0} hidden={!enableRealtimePreview}>
+            {enableRealtimePreview &&
+                <Box pb={1}>
+                    <Typography variant="body2" fontWeight="bolder" display="inline-block">实时预览
+                    </Typography>
+                    <Checkbox size="small" checked={enableRealtimePreview} onChange={(e, c) => setEnableRealtimePreview(c)} />
+                </Box>
+            }
+
+        </Grid>
+
+        <Grid item xs={12} sm={enableRealtimePreview ? 6 : 12}>
+            <Box maxHeight={'calc(100vh - 10rem)'} overflow="auto" pt="1px">
                 <TextField
                     size="small"
                     fullWidth
@@ -59,24 +73,18 @@ function MarkdownEditor({ initialValue, updateCallback }: {
 
             </Box>
         </Grid>
-        <Grid item xs={12} sm={enableRealtimePreview ? 6 : 0}>
-            {enableRealtimePreview &&
-                <Box pb={1}>
-                    <Typography variant="body2" fontWeight="bolder" display="inline-block">实时预览
-                    </Typography>
-                    <Checkbox size="small" checked={enableRealtimePreview} onChange={(e, c) => setEnableRealtimePreview(c)} />
-                </Box>
-            }
-            <Box position="sticky" top={0} maxHeight='calc(100vh - 10rem)' overflow={"auto"}>
 
+        <Grid item xs={12} sm={enableRealtimePreview ? 6 : 0}>
+            <Box maxHeight={'calc(100vh - 10rem)'} overflow="auto">
                 {enableRealtimePreview &&
                     <Box p={2} border={1} borderColor="divider" borderRadius={(theme) => `${theme.shape.borderRadius}px`}>
                         {markdownGetReactDOMs(md)}
                     </Box>
+
                 }
             </Box>
         </Grid>
-    </Grid>
+    </Grid >
 }
 
 export default MarkdownEditor;

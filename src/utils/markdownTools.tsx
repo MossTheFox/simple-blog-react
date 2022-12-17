@@ -66,7 +66,7 @@ export function markdownGetReactDOMs(md: string | marked.Token[]): (JSX.Element 
                 return <span key={i}>`${v.raw}`</span>;
             case 'image':
                 // TODO: 图片框组件...
-                return <img key={i} src={v.href} alt={v.text} />
+                return <img key={i} src={v.href} alt={v.text} style={{ maxWidth: '100%' }} />
             case 'link':
                 return <Link key={i} href={v.href} target="_blank" underline='hover'>{children}</Link>;
             case 'list':
