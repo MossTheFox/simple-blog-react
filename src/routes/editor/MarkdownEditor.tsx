@@ -76,18 +76,18 @@ function MarkdownEditor({ initialValue, updateCallback }: {
             </Box>
         </Grid>
 
-        <Grid item xs={12} sm={enableRealtimePreview ? 6 : 0}>
-            <Box height={'calc(100vh - 10rem)'} overflow="auto"
-                border={1} borderColor="divider" borderRadius={(theme) => `${theme.shape.borderRadius}px`}
-            >
-                {enableRealtimePreview &&
+        {enableRealtimePreview &&
+            <Grid item xs={12} sm={enableRealtimePreview ? 6 : 0}>
+                <Box height={'calc(100vh - 10rem)'} overflow="auto"
+                    border={1} borderColor="divider" borderRadius={(theme) => `${theme.shape.borderRadius}px`}
+                >
                     <Box p={2}>
                         {markdownGetReactDOMs(md)}
                     </Box>
 
-                }
-            </Box>
-        </Grid>
+                </Box>
+            </Grid>
+        }
     </Grid >
 }
 
