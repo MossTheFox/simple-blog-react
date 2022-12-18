@@ -1,4 +1,4 @@
-import { Box, Collapse, Link, Pagination, Stack, Typography } from "@mui/material";
+import { Box, Collapse, Fade, Link, Pagination, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, Link as ReactRouterLink } from 'react-router-dom';
 import AsyncLoadingHandler, { TemplateLoadingPlaceHolder, TemplateOnErrorRender } from "../../hooks/AsyncLoadingHandler";
@@ -128,31 +128,35 @@ function MainArticleList({ mode = 'all' }: {
                 >返回所有文章列表</Link>
             </Typography>
         }
-        <Stack spacing={2} pb={2}>
+        <Box pb={2}>
             {/* 生命周期内会发生变化的组件，不使用 AsyncLoadingHandler */}
             {loading ? (<TemplateLoadingPlaceHolder />) : (
                 error ? (
                     <TemplateOnErrorRender message={error.message} retryFunc={fireFetchPageRerender} />
                 ) : (
-                    <>
-                        {articleList.map((v, i) =>
-                            <BlogSummaryCardMain key={i} blogSummaryData={v} />
-                        )}
+                    <Fade in>
+                        <Stack spacing={2}>
+                            {
+                                articleList.map((v, i) =>
+                                    <BlogSummaryCardMain key={i} blogSummaryData={v} />
+                                )
+                            }
 
-                        {articleList.length === 0 && (
-                            <Typography variant="body2" color="textSecondary" gutterBottom
-                                sx={{
-                                    textIndent: (theme) => theme.spacing(2),
-                                }}
-                            >
-                                暂时还没有文章。
-                            </Typography>
-                        )}
+                            {articleList.length === 0 && (
+                                <Typography variant="body2" color="textSecondary" gutterBottom
+                                    sx={{
+                                        textIndent: (theme) => theme.spacing(2),
+                                    }}
+                                >
+                                    暂时还没有文章。
+                                </Typography>
+                            )}
+                        </Stack>
+                    </Fade>
 
-                    </>
                 )
             )}
-        </Stack>
+        </Box>
         {(totalPage > 1) && (
             <Box py={2} display='flex' alignItems='center' justifyContent='center'>
                 <Pagination color="primary" count={totalPage} page={page} onChange={(_, page) => pageChangeAction(page)} />

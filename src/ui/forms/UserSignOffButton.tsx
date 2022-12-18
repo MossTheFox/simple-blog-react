@@ -9,7 +9,7 @@ function UserSignOffButton(props: ButtonProps) {
     const [open, setOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-    const { user, set } = useContext(blogUserContext);
+    const { user, set, init } = useContext(blogUserContext);
 
     const [loading, setLoading] = useState(false);
     const [err, setError] = useState<Error | null>(null);
@@ -29,8 +29,8 @@ function UserSignOffButton(props: ButtonProps) {
         setOpen(false);
         setLoading(false);
         setError(null);
-        set('Not Login');
-    }, [set]);
+        init();
+    }, [init]);
 
     const onError = useCallback((e: Error) => {
         setOpen(false);
