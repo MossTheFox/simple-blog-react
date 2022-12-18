@@ -115,7 +115,7 @@ function BlogPostEditorPage({ mode }: { mode: 'new' | 'edit' }) {
 
         <Dialog open={submitDialogOpen} fullWidth maxWidth='md' onClose={handleClose}>
             <DialogLoadingIndicator loading={loading} />
-            <DialogTitle>{mode === 'edit' ? '修改' : '发布'}确认</DialogTitle>
+            <DialogTitle fontWeight='bolder'>{mode === 'edit' ? '修改' : '发布'}确认</DialogTitle>
             <DialogContent>
                 {/* TODO: 改样式 */}
                 <Typography variant="body2" whiteSpace='pre-wrap'>
@@ -137,7 +137,7 @@ function BlogPostEditorPage({ mode }: { mode: 'new' | 'edit' }) {
 
         <Dialog open={menuDialogOpen} fullWidth maxWidth='sm' onClose={handleClose}>
             <DialogLoadingIndicator loading={deleteLoading} />
-            <DialogTitle>更多操作</DialogTitle>
+            <DialogTitle fontWeight='bolder'>更多操作</DialogTitle>
             <DialogContent>
                 <Stack spacing={1} pb={2}>
                     <Box>

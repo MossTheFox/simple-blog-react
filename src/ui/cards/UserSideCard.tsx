@@ -4,6 +4,7 @@ import { useContext, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { blogUserContext } from "../../context/userContext";
 import UserLoginForm from "../forms/UserLoginForm";
+import UserRegisterDialog from "../forms/UserRefgisterDialog";
 import UserSignOffButton from "../forms/UserSignOffButton";
 
 function UserSideCard() {
@@ -36,7 +37,11 @@ function UserSideCard() {
 
             </Collapse>
             <Collapse in={!loginFormOpen}>
-                <Button size="small" fullWidth variant="outlined" onClick={() => { setLoginFormOpen(true) }} children="登录" />
+                <Stack spacing={1}>
+
+                    <Button size="small" fullWidth variant="outlined" onClick={() => { setLoginFormOpen(true) }} children="登录" />
+                    <Button size="small" fullWidth variant="contained" onClick={() => { setRegisterFormOpen(true) }} children="注册" />
+                </Stack>
             </Collapse>
         </>
             :
@@ -55,6 +60,8 @@ function UserSideCard() {
                 </Box>
             </Stack>
         }
+
+        <UserRegisterDialog open={registerFormOpen} setOpen={setRegisterFormOpen} />
     </Box>
 }
 

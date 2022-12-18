@@ -19,6 +19,13 @@ function MarkdownEditor({ initialValue, updateCallback }: {
         }
     }, [md, updateCallback]);
 
+    const urlCallback = useCallback((url: string) => {
+        setMd((prev) => (
+            prev + '\n\n'
+            + `![image](${url})`
+        ))
+    }, []);
+
     return <Grid container spacing={2}>
         <Grid item xs={12} sm={enableRealtimePreview ? 6 : 12}>
             <Box display='flex' justifyContent='space-between'>
@@ -44,7 +51,7 @@ function MarkdownEditor({ initialValue, updateCallback }: {
                 }
             </Box>
             <Box py={1}>
-                <ImageUploadButton children="插入图片" />
+                <ImageUploadButton children="插入图片" urlCallback={urlCallback} />
             </Box>
         </Grid>
 
