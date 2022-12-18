@@ -21,9 +21,10 @@ export const initBlogEditorData: BlogPostEditorData = {
     content: '使用 [Markdown](https://www.markdownguide.org/cheat-sheet/) 格式来撰写文章。',
 };
 
-function BlogPostEditor({ mode, submitCallback }: {
+function BlogPostEditor({ mode, submitCallback, actionMenuCallback }: {
     mode: 'new' | 'edit';
     submitCallback: (data: BlogPostEditorData) => void;
+    actionMenuCallback: () => void;
 }) {
     // TODO: 保存草稿 (localStorage | Origin Private File System)
     const { user, set } = useContext(blogUserContext);
@@ -144,11 +145,19 @@ function BlogPostEditor({ mode, submitCallback }: {
                             <Box>
                                 <Box display="flex" justifyContent='space-between'>
                                     <Typography variant="h5" fontWeight="bolder" gutterBottom>文章编辑器</Typography>
-                                    <Button variant="contained"
-                                        startIcon={<Send />}
-                                        onClick={() => submitCallback(blogData)}>
-                                        {mode === 'edit' ? '提交修改' : '发布文章'}
-                                    </Button>
+                                    <Box display="flex" gap={2} flexWrap="wrap">
+                                        {mode === 'edit' &&
+                                            <Button variant="text"
+                                                onClick={actionMenuCallback}>
+                                                其他操作
+                                            </Button>
+                                        }
+                                        <Button variant="contained"
+                                            startIcon={<Send />}
+                                            onClick={() => submitCallback(blogData)}>
+                                            {mode === 'edit' ? '提交修改' : '发布文章'}
+                                        </Button>
+                                    </Box>
                                 </Box>
                                 <Typography variant="body2" gutterBottom color="textSecondary">发布者: {(typeof user === 'object') ? user.username : '未登录'}</Typography>
                                 {mode === 'edit' &&
