@@ -1,6 +1,6 @@
-import { Box, Collapse, Pagination, Stack, Typography } from "@mui/material";
+import { Box, Collapse, Link, Pagination, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams } from 'react-router-dom';
+import { useParams, Link as ReactRouterLink } from 'react-router-dom';
 import AsyncLoadingHandler, { TemplateLoadingPlaceHolder, TemplateOnErrorRender } from "../../hooks/AsyncLoadingHandler";
 import useAsync from "../../hooks/useAsync";
 import { APIService } from "../../scripts/dataAPIInterface";
@@ -14,7 +14,7 @@ type SearchQuery = {
     searchText: string;
 };
 
-function MainArticleList({ mode }: {
+function MainArticleList({ mode = 'all' }: {
     mode?: 'all' | 'tag' | 'author' | 'category' | 'search'
 }) {
 
@@ -43,7 +43,7 @@ function MainArticleList({ mode }: {
     }, [mode, authorName, categoryName, tagName, searchText]);
 
     const [articleList, setArticleList] = useState<BlogSummaryData[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
     // 拉取文章总数与列表 (会在组件生命周期内刷新)
@@ -91,18 +91,21 @@ function MainArticleList({ mode }: {
         switch (mode) {
             case 'author':
                 setSearchQuery({ author: authorName });
+                break;
             case 'category':
                 setSearchQuery({ category: categoryName });
+                break;
             case 'tag':
                 setSearchQuery({ tag: tagName });
+                break;
             case 'search':
                 setSearchQuery({ searchText: searchText });
+                break;
             default:
                 setSearchQuery(null);
         }
         setPage(1);
         fireFetchPageRerender();
-        // TODO: 刷新页码
     }, [mode, authorName, categoryName, tagName, searchText]);
 
 
@@ -114,17 +117,39 @@ function MainArticleList({ mode }: {
         >
             {title}
         </Typography>
-
+        {mode !== 'all' &&
+            <Typography variant="body2" gutterBottom
+                sx={{
+                    textIndent: (theme) => theme.spacing(2),
+                }}
+            >
+                <Link component={ReactRouterLink} underline="hover"
+                    to="/"
+                >返回所有文章列表</Link>
+            </Typography>
+        }
         <Stack spacing={2} pb={2}>
             {/* 生命周期内会发生变化的组件，不使用 AsyncLoadingHandler */}
             {loading ? (<TemplateLoadingPlaceHolder />) : (
                 error ? (
                     <TemplateOnErrorRender message={error.message} retryFunc={fireFetchPageRerender} />
                 ) : (
-                    articleList.map((v, i) =>
-                        <BlogSummaryCardMain key={i} blogSummaryData={v} />
-                    )
+                    <>
+                        {articleList.map((v, i) =>
+                            <BlogSummaryCardMain key={i} blogSummaryData={v} />
+                        )}
 
+                        {articleList.length === 0 && (
+                            <Typography variant="body2" color="textSecondary" gutterBottom
+                                sx={{
+                                    textIndent: (theme) => theme.spacing(2),
+                                }}
+                            >
+                                暂时还没有文章。
+                            </Typography>
+                        )}
+
+                    </>
                 )
             )}
         </Stack>

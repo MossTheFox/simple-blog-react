@@ -60,7 +60,7 @@ function MarkdownEditor({ initialValue, updateCallback }: {
         </Grid>
 
         <Grid item xs={12} sm={enableRealtimePreview ? 6 : 12}>
-            <Box maxHeight={'calc(100vh - 10rem)'} overflow="auto" pt="1px">
+            <Box height={'calc(100vh - 10rem)'} overflow="auto" pt="1px">
                 <TextField
                     size="small"
                     fullWidth
@@ -75,7 +75,7 @@ function MarkdownEditor({ initialValue, updateCallback }: {
         </Grid>
 
         <Grid item xs={12} sm={enableRealtimePreview ? 6 : 0}>
-            <Box maxHeight={'calc(100vh - 10rem)'} overflow="auto">
+            <Box height={'calc(100vh - 10rem)'} overflow="auto">
                 {enableRealtimePreview &&
                     <Box p={2} border={1} borderColor="divider" borderRadius={(theme) => `${theme.shape.borderRadius}px`}>
                         {markdownGetReactDOMs(md)}

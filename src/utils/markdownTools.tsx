@@ -18,6 +18,8 @@ export function markdownGetReactDOMs(md: string | marked.Token[]): (JSX.Element 
             case 'blockquote':
                 // 引用
                 return <Typography key={i}
+                // Note: 避免 <p> 嵌套 <p>
+                    component={'div'}
                     variant="body1"
                     color="textSecondary"
                     pl={4}
@@ -65,7 +67,6 @@ export function markdownGetReactDOMs(md: string | marked.Token[]): (JSX.Element 
                 // 拒绝 parse... 除了个别特例
                 switch (v.raw.trim()) {
                     case '<br>':
-                        console.log('AAA')
                         return <br key={i} />;
                     default:
                         return <span key={i}>{v.raw}</span>;
