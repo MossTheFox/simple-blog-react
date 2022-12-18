@@ -1,4 +1,5 @@
-import { Box, Button, Grid, Stack, TextField, Typography } from "@mui/material";
+import { Send } from "@mui/icons-material";
+import { Box, Button, Checkbox, FormControlLabel, Grid, Stack, TextField, Typography } from "@mui/material";
 import { Container } from "@mui/system";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -15,7 +16,7 @@ export const initBlogEditorData: BlogPostEditorData = {
     allowComment: true,
     title: '文章标题',
     summary: '这里的文字会显示在文章卡片上。',
-    category: '',
+    category: '默认',
     tags: [],
     content: '使用 [Markdown](https://www.markdownguide.org/cheat-sheet/) 格式来撰写文章。',
 };
@@ -139,11 +140,15 @@ function BlogPostEditor({ mode, submitCallback }: {
                 {(!loading && err) && <TemplateOnErrorRender />}
                 {(!loading && !err) &&
                     <>
-                        <Stack spacing={1} mb={2}>
+                        <Stack spacing={2} mb={2}>
                             <Box>
                                 <Box display="flex" justifyContent='space-between'>
                                     <Typography variant="h5" fontWeight="bolder" gutterBottom>文章编辑器</Typography>
-                                    <Button variant="contained" onClick={() => submitCallback(blogData)}>{mode === 'edit' ? '提交修改' : '发布文章'}</Button>
+                                    <Button variant="contained"
+                                        startIcon={<Send />}
+                                        onClick={() => submitCallback(blogData)}>
+                                        {mode === 'edit' ? '提交修改' : '发布文章'}
+                                    </Button>
                                 </Box>
                                 <Typography variant="body2" gutterBottom color="textSecondary">发布者: {(typeof user === 'object') ? user.username : '未登录'}</Typography>
                                 {mode === 'edit' &&
@@ -172,7 +177,12 @@ function BlogPostEditor({ mode, submitCallback }: {
                                 onChange={(e) => updateBlogData('summary', e.target.value)}
                             />
                         </Stack>
-
+                        <Box pb={2}>
+                            <Typography variant="h6" fontWeight="bolder" gutterBottom>评论开关</Typography>
+                            <FormControlLabel control={
+                                <Checkbox checked={blogData.allowComment} onChange={(e, c) => updateBlogData('allowComment', c)} />}
+                                label="允许评论" />
+                        </Box>
                         <Grid container spacing={2} mb={2}>
                             <Grid item xs={12} sm={6}>
                                 <Typography variant="h6" fontWeight="bolder" gutterBottom>分类</Typography>

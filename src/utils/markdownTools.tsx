@@ -76,7 +76,8 @@ export function markdownGetReactDOMs(md: string | marked.Token[]): (JSX.Element 
                 return <img key={i} src={v.href} alt={v.text} style={{ maxWidth: '100%' }} />
             case 'link':
                 // 自动生成的链接中，text 和 href 相等. 此时不进行下一步转换
-                if (v.text === v.href) {
+                // 邮箱...例外
+                if (v.text === v.href || v.href.startsWith('mailto:')) {
                     return <Link key={i} href={v.href} target="_blank" underline='hover'>{v.raw}</Link>;
                 } else {
                     return <Link key={i} href={v.href} target="_blank" underline='hover'>{children}</Link>;

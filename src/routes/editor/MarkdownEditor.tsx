@@ -11,7 +11,7 @@ function MarkdownEditor({ initialValue, updateCallback }: {
 
     const [md, setMd] = useState(initialValue ?? '');
 
-    const [enableRealtimePreview, setEnableRealtimePreview] = useState(true);
+    const [enableRealtimePreview, setEnableRealtimePreview] = useState(false);
 
     useEffect(() => {
         if (updateCallback) {
@@ -60,12 +60,14 @@ function MarkdownEditor({ initialValue, updateCallback }: {
         </Grid>
 
         <Grid item xs={12} sm={enableRealtimePreview ? 6 : 12}>
-            <Box height={'calc(100vh - 10rem)'} overflow="auto" pt="1px">
+            <Box height={'calc(100vh - 10rem)'} overflow="auto"
+                border={1} borderColor="divider" borderRadius={(theme) => `${theme.shape.borderRadius}px`}
+            >
                 <TextField
                     size="small"
                     fullWidth
                     multiline
-                    minRows={10}
+                    minRows={20}
                     autoComplete="off"
                     value={md}
                     onChange={(e) => setMd(e.target.value)}
@@ -75,9 +77,11 @@ function MarkdownEditor({ initialValue, updateCallback }: {
         </Grid>
 
         <Grid item xs={12} sm={enableRealtimePreview ? 6 : 0}>
-            <Box height={'calc(100vh - 10rem)'} overflow="auto">
+            <Box height={'calc(100vh - 10rem)'} overflow="auto"
+                border={1} borderColor="divider" borderRadius={(theme) => `${theme.shape.borderRadius}px`}
+            >
                 {enableRealtimePreview &&
-                    <Box p={2} border={1} borderColor="divider" borderRadius={(theme) => `${theme.shape.borderRadius}px`}>
+                    <Box p={2}>
                         {markdownGetReactDOMs(md)}
                     </Box>
 
