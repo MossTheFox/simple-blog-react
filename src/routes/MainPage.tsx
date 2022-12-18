@@ -14,7 +14,7 @@ import UserSideCard from "../ui/cards/UserSideCard";
 
 function MainPage() {
     return <>
-        <NavBar />
+        <NavBar showSearchBar />
 
         <Container maxWidth="lg">
             <Box py={2}>

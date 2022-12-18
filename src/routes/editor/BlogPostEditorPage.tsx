@@ -40,8 +40,8 @@ function BlogPostEditorPage({ mode }: { mode: 'new' | 'edit' }) {
 
     /** 发布 */
     const asyncSubmit = useCallback(async () => {
-        if (typeof id === 'undefined') throw new Error('无效的文章 ID');
         if (mode === 'edit') {
+            if (typeof id === 'undefined') throw new Error('无效的文章 ID');
             return await APIService.updateArticle({ ...submitTarget, id: +id });
         }
         return await APIService.postArticle(submitTarget);
@@ -50,7 +50,9 @@ function BlogPostEditorPage({ mode }: { mode: 'new' | 'edit' }) {
     const submitOnSuccess = useCallback((newID: number) => {
         setLoading(false);
         setError(null);
-        navigate(`/blog/${newID}`);
+        navigate(`/blog/${newID}`, {
+            replace: true
+        });
     }, [navigate]);
 
     const submitOnError = useCallback((e: Error) => {

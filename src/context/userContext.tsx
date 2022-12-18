@@ -63,9 +63,15 @@ export function UserContextProvider({ children }: { children?: React.ReactNode }
             setUser('Not Login');
             return;
         }
-        setUser({
-            ...blogUserContextBase,
-            ...data
+        setUser(() => {
+            let userObject = {
+                ...blogUserContextBase,
+                ...data
+            };
+            if (userObject.id < 0) {
+                return 'Not Login';
+            }
+            return userObject;
         });
     }, []);
 

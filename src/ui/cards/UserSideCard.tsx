@@ -29,6 +29,7 @@ function UserSideCard() {
         </Box>
 
         {user === 'Not Login' ? <>
+            {/* 未登录 */}
             <Collapse in={loginFormOpen}>
                 <UserLoginForm mb={3} />
                 <Button size="small" startIcon={<ArrowBack />} variant="outlined" onClick={() => { setLoginFormOpen(false) }} children="返回" />
@@ -38,7 +39,9 @@ function UserSideCard() {
                 <Button size="small" fullWidth variant="outlined" onClick={() => { setLoginFormOpen(true) }} children="登录" />
             </Collapse>
         </>
-            : <Stack spacing={2}>
+            :
+            // 已登录
+            <Stack spacing={2}>
                 <Button fullWidth startIcon={<BorderColor />} children="发布文章" variant="contained"
                     onClick={() => navigate('/editor/new')}
                 />
@@ -50,7 +53,8 @@ function UserSideCard() {
                 <Box textAlign="end">
                     <UserSignOffButton variant="text" size="small">注销登陆</UserSignOffButton>
                 </Box>
-            </Stack>}
+            </Stack>
+        }
     </Box>
 }
 

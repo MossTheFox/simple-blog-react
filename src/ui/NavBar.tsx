@@ -1,9 +1,15 @@
-import { GitHub } from "@mui/icons-material";
-import { AppBar, Toolbar, Typography, Container, IconButton, Link, Breakpoint } from "@mui/material";
+import { GitHub, Search } from "@mui/icons-material";
+import { AppBar, Toolbar, Typography, Container, Link, Breakpoint } from "@mui/material";
 import { Link as ReactRouterLink } from 'react-router-dom';
+import ArticleSearchBar from "./forms/ArticleSearchBar";
 
 
-function NavBar({ maxWidth = 'lg', position = "sticky" }: { maxWidth?: Breakpoint, position?: "fixed" | "sticky" | "absolute" | "relative" | "static" | undefined }) {
+function NavBar({ maxWidth = 'lg', position = "sticky", showSearchBar = false }:
+    {
+        maxWidth?: Breakpoint,
+        position?: "fixed" | "sticky" | "absolute" | "relative" | "static" | undefined,
+        showSearchBar?: boolean
+    }) {
 
     return (
         <AppBar position={position} color="primary">
@@ -14,11 +20,9 @@ function NavBar({ maxWidth = 'lg', position = "sticky" }: { maxWidth?: Breakpoin
                             很厉害的博客
                         </Link>
                     </Typography>
-                    <IconButton size="large" color="inherit"
-                        children={<GitHub />}
-                        href="https://github.com/MossTheFox/simple-blog-react"
-                        target="_blank"
-                    />
+                    {showSearchBar &&
+                        <ArticleSearchBar />
+                    }
                 </Toolbar>
             </Container>
         </AppBar>
