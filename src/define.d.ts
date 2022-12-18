@@ -14,6 +14,14 @@ type BlogPostData = {
     lastModified: Date;
 };
 
+type BlogPostEditorData = Omit<BlogPostData, keyof {
+    id: number;
+    author: string;
+    authorId: number;
+    createdAt: Date;
+    lastModified: Date;
+}>;
+
 type BlogSummaryData = {
     id: number;
     author: string;

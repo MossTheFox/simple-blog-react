@@ -1,67 +1,58 @@
-import { Box, Grid, Stack, TextField, Typography } from "@mui/material";
-import { Container } from "@mui/system";
-import { useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { blogUserContext } from "../../context/userContext";
-import CategorySelector from "../../ui/forms/CategorySelector";
-import TagSelector from "../../ui/forms/TagSelector";
-import NavBar from "../../ui/NavBar";
-import MarkdownEditor from "./MarkdownEditor";
+import DialogLoadingIndicator from "../../ui/smallComponents/DialogLoadingIndicator";
+import BlogPostEditor, { initBlogEditorData } from "./BlogPostEditor";
 
 function BlogPostEditorPage({ mode }: { mode: 'new' | 'edit' }) {
-    // TODO: 保存草稿 (localStorage | Origin Private File System)
+
+    const [open, setOpen] = useState(false);
+    const [submitTarget, setSubmitTarget] = useState<BlogPostEditorData>(initBlogEditorData);
+
+    const [loading, setLoading] = useState(false);
+
+    /** 编辑模式下使用 */
+    const { id } = useParams();
+
+    const submitCallback = useCallback((data: BlogPostEditorData) => {
+        setSubmitTarget(data);
+        setOpen(true);
+    }, []);
+
+    const handleClose = useCallback(() => {
+        if (loading) return;
+        setOpen(false);
+    }, [loading]);
+
 
     const { user, set } = useContext(blogUserContext);
     const navigate = useNavigate();
+
     useEffect(() => {
-        if (typeof user === 'string') {
+        if (typeof user === 'string' ||
+            (mode === 'edit' && (typeof id === 'undefined' || Number.isNaN(+id)))
+        ) {
             navigate('/', {
                 replace: true
             })
         }
-    }, [navigate, user])
+    }, [navigate, user, mode, id])
 
     return <>
-        <NavBar maxWidth="xl" position="static" />
-        <Container maxWidth="xl">
-            <Box py={2}>
-                <Stack spacing={1} mb={2}>
-                    <Box>
-                        <Typography variant="h5" fontWeight="bolder" gutterBottom>文章编辑器</Typography>
-                        <Typography variant="body2" gutterBottom color="textSecondary">发布者: {(typeof user === 'object') ? user.username : '未登录'}</Typography>
-                    </Box>
-                    <TextField
-                        variant="filled"
-                        label="标题"
-                        fullWidth
-                        autoComplete="off"
-                    />
-                    <TextField
-                        variant="outlined"
-                        size="small"
-                        label="摘要"
-                        autoComplete="off"
-                        fullWidth
-                        multiline
-                        minRows={2}
-                    />
-                </Stack>
+        <BlogPostEditor mode={mode} submitCallback={submitCallback} />
 
-                <Grid container spacing={2} mb={2}>
-                    <Grid item xs={12} sm={6}>
-                        <Typography variant="h6" fontWeight="bolder" gutterBottom>分类</Typography>
-                        <CategorySelector />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <Typography variant="h6" fontWeight="bolder" gutterBottom>标签</Typography>
-                        <TagSelector />
-                    </Grid>
-                </Grid>
-
-                <MarkdownEditor />
-            </Box>
-
-        </Container>
+        <Dialog open={open} fullWidth maxWidth='md' onClose={handleClose}>
+            <DialogLoadingIndicator loading={loading} />
+            <DialogTitle>{mode === 'edit' ? '修改' : '发布'}确认</DialogTitle>
+            <DialogContent>
+                {JSON.stringify(submitTarget)}
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleClose}>取消</Button>
+                <Button onClick={handleClose}>确认</Button>
+            </DialogActions>
+        </Dialog>
     </>
 }
 

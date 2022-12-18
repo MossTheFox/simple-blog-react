@@ -4,34 +4,16 @@ import AsyncLoadingHandler from "../../hooks/AsyncLoadingHandler";
 import { APIService } from "../../scripts/dataAPIInterface";
 
 function TagSelector({
-    onSelectedChange
+    setTags,
+    tags,
+    insert,
+    deleteOne
 }: {
-    onSelectedChange?: (selected: string[]) => void
+    setTags: (selected: string[]) => void,
+    tags: string[],
+    insert: (str: string) => void,
+    deleteOne: (str: string | number) => void
 }) {
-    const [selected, setSelected] = useState<string[]>([]);
-
-    useEffect(() => {
-        if (onSelectedChange) {
-            onSelectedChange(selected);
-        }
-    }, [selected, onSelectedChange]);
-
-    const insertNew = useCallback((newTag: string) => {
-        setSelected((prev) => {
-            let set = new Set<string>([...prev, newTag]);
-            return Array.from(set);
-        })
-    }, []);
-
-    const deleteOne = useCallback((tag: string | number) => {
-        setSelected((prev) => {
-            let index = typeof tag === 'number' ? tag : (prev.findIndex((v) => v === tag));
-            if (index === -1) return [...prev];
-            let newArray = [...prev];
-            newArray.splice(index, 1);
-            return newArray;
-        })
-    }, []);
 
     const [tagList, setTagList] = useState<TagListData>([]);
 
@@ -45,9 +27,9 @@ function TagSelector({
 
             const handleSubmit = useCallback(() => {
                 if (customInput.length === 0) return;
-                insertNew(customInput);
+                insert(customInput);
                 setCustomInput('');
-            }, [customInput]);
+            }, [insert, customInput]);
 
             const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
                 let newValue = e.target.value;
@@ -58,10 +40,10 @@ function TagSelector({
             return <Grid container>
                 <Grid item xs={6}>
                     <Box display="flex" flexWrap={'wrap'} gap={1}>
-                        {selected.length === 0 ? (
+                        {tags.length === 0 ? (
                             <Typography variant="body2" color="textSecondary">在右栏添加标签...</Typography>
                         ) : (
-                            selected.map((v, i) => (
+                            tags.map((v, i) => (
                                 <Chip key={i}
                                     label={v}
                                     color="primary"
@@ -78,7 +60,7 @@ function TagSelector({
                             <Chip key={i}
                                 label={`${v.name} (${v.postsCount})`}
                                 color="default"
-                                onClick={insertNew.bind(null, v.name)}
+                                onClick={insert.bind(null, v.name)}
                             />
                         ))}
                     </Box>

@@ -1,57 +1,53 @@
 import { Box, MenuItem, Select, Stack, TextField } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import AsyncLoadingHandler from "../../hooks/AsyncLoadingHandler";
 import { APIService } from "../../scripts/dataAPIInterface";
 
 export const createNewCategoryKey = '- 新增 -' as const;
 
 function CategorySelector({
-    onSelectedChange
+    initialData = createNewCategoryKey,
+    setSelected,
 }: {
-    onSelectedChange?: (str: string) => void
+    setSelected: (str: string) => void,
+    initialData?: string
 }) {
-    const [selected, setSelected] = useState<string>(createNewCategoryKey);
 
-    useEffect(() => {
-        if (onSelectedChange && selected !== createNewCategoryKey) {
-            onSelectedChange(selected);
-        }
-    }, [selected, onSelectedChange]);
-
-    const [categoryList, setCategoryList] = useState<CategoryListData>([{ name: createNewCategoryKey, postsCount: 0 }]);
 
     return <AsyncLoadingHandler asyncFunc={APIService.getBlogCategoryList}
         OnSuccessRender={({ data }) => {
-            useEffect(() => {
-                setCategoryList(data);
-            }, [data, setCategoryList]);
+            const [categoryList, setCategoryList] = useState<CategoryListData>(() => data);
 
-            const [customCategory, setCustomCategory] = useState('');
-
-            const updateInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-                setCustomCategory(e.target.value);
-                if (onSelectedChange) {
-                    onSelectedChange(e.target.value);
+            // init list
+            const [dropdownSelected, setDropdownSelected] = useState<string>(() => {
+                if (data.map((v) => v.name).includes(initialData)) {
+                    return initialData;
                 }
-            }, [onSelectedChange]);
+                return createNewCategoryKey;
+            });
+
+            // on dropdown menu change
+            const updateDropdownSelected = useCallback((v: string) => {
+                setDropdownSelected(v);
+                setSelected(v);
+            }, [setSelected]);
+
+            // 
+            const updateInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+                setSelected(e.target.value);
+            }, []);
 
             return <Stack spacing={1}>
-                <Select fullWidth size="small" onChange={(e) => setSelected(e.target.value + '')}
-                    value={selected}
+                <Select fullWidth size="small" onChange={(e) => updateDropdownSelected(e.target.value + '')}
+                    value={dropdownSelected}
                 >
                     <MenuItem value={createNewCategoryKey}>{createNewCategoryKey}</MenuItem>
                     {categoryList.map((v, i) => (
                         <MenuItem value={v.name} key={i}>{`${v.name}`}{v.postsCount > 0 ? ` (${v.postsCount})` : ''}</MenuItem>
                     ))}
                 </Select>
-                {selected === createNewCategoryKey && (
-                    <Box>
-                        <TextField variant="standard" size="small" label="分类名称" fullWidth
-                            value={customCategory}
-                            onChange={updateInput}
-                        />
-                    </Box>
-                )}
+
+                
             </Stack>
         }}
     />
