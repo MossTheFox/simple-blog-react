@@ -22,7 +22,7 @@ export function markdownGetReactDOMs(md: string | marked.Token[]): (JSX.Element 
                     color="textSecondary"
                     pl={4}
                     gutterBottom
-                >{v.text}</Typography>;
+                >{children}</Typography>;
             case 'br':
                 // 额外的换行
                 return <br key={i} />;
@@ -31,14 +31,14 @@ export function markdownGetReactDOMs(md: string | marked.Token[]): (JSX.Element 
                 switch (v.codeBlockStyle) {
                     case 'indented':
                         return <pre key={i}>
-                            <code>{v.text}</code>
+                            <code>{children}</code>
                         </pre>;
                     default:
                         // 触发条件未知 (得看 marked 源码)
-                        return <code key={i}>{v.text}</code>;
+                        return <code key={i}>{children}</code>;
                 }
             case 'codespan':
-                return <code key={i}>{v.text}</code>;
+                return <code key={i}>{children}</code>;
             case 'del':
                 return <del key={i}>{children}</del>;
             case 'def':
@@ -62,13 +62,24 @@ export function markdownGetReactDOMs(md: string | marked.Token[]): (JSX.Element 
             case 'hr':
                 return <Divider key={i} />;
             case 'html':
-                // 拒绝 parse...
-                return <span key={i}>`${v.raw}`</span>;
+                // 拒绝 parse... 除了个别特例
+                switch (v.raw.trim()) {
+                    case '<br>':
+                        console.log('AAA')
+                        return <br key={i} />;
+                    default:
+                        return <span key={i}>{v.raw}</span>;
+                }
             case 'image':
                 // TODO: 图片框组件...
                 return <img key={i} src={v.href} alt={v.text} style={{ maxWidth: '100%' }} />
             case 'link':
-                return <Link key={i} href={v.href} target="_blank" underline='hover'>{children}</Link>;
+                // 自动生成的链接中，token 长度为 1. 此时不进行下一步转换
+                if (v.tokens.length <= 1) {
+                    return <Link key={i} href={v.href} target="_blank" underline='hover'>{v.raw}</Link>;
+                } else {
+                    return <Link key={i} href={v.href} target="_blank" underline='hover'>{children}</Link>;
+                }
             case 'list':
                 if (v.ordered) {
                     return <ol start={v.start || 1} key={i}>{markdownGetReactDOMs(v.items)}</ol>;
