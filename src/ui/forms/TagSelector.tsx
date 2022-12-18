@@ -32,7 +32,7 @@ function TagSelector({
             }, [insert, customInput]);
 
             const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-                let newValue = e.target.value;
+                let newValue = e.target.value.trim();
                 newValue = newValue.split(',').join('');
                 setCustomInput(newValue);
             }, []);

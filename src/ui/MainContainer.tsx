@@ -9,6 +9,7 @@ function MainContainer({ disableBottomPadding = false, children }: { disableBott
     return <Box
         sx={{
             backgroundColor: (theme) => theme.palette.mode === "dark" ? "#292726" : "#faf9f6",
+            pb: 20
         }}
     >
         {children}

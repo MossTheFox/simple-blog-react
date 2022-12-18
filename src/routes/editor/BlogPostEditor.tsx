@@ -82,6 +82,10 @@ function BlogPostEditor({ mode, submitCallback, actionMenuCallback }: {
     const [showCatInput, setShowCatInput] = useState(mode === 'new');
     const [catInput, setCatInput] = useState('');
 
+    const updateCatInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setCatInput(e.target.value);
+    }, []);
+
     /** 一些 Callback */
     const updateCategory = useCallback((cat: string) => {
         if (cat === createNewCategoryKey) {
@@ -202,7 +206,7 @@ function BlogPostEditor({ mode, submitCallback, actionMenuCallback }: {
                                 <Box hidden={!showCatInput} py={1}>
                                     <TextField variant="standard" size="small" label="分类名称" fullWidth
                                         value={catInput}
-                                        onChange={(e) => setCatInput(e.target.value)}
+                                        onChange={updateCatInput}
                                     />
                                 </Box>
                             </Grid>
