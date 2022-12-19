@@ -11,6 +11,13 @@ import BlogPostEditor, { initBlogEditorData } from "./BlogPostEditor";
 
 function BlogPostEditorPage({ mode }: { mode: 'new' | 'edit' }) {
 
+    /**
+     * TODO:
+     * - 返回菜单
+     * - 美化？更合理的布局
+     * - 自动保存
+     */
+
     const navigate = useNavigate();
 
     const [submitDialogOpen, setSubmitDialogOpen] = useState(false);

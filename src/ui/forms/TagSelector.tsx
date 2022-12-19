@@ -27,12 +27,12 @@ function TagSelector({
 
             const handleSubmit = useCallback(() => {
                 if (customInput.length === 0) return;
-                insert(customInput);
+                insert(customInput.trim());
                 setCustomInput('');
             }, [insert, customInput]);
 
             const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-                let newValue = e.target.value.trim();
+                let newValue = e.target.value;
                 newValue = newValue.split(',').join('');
                 setCustomInput(newValue);
             }, []);

@@ -1,5 +1,5 @@
 import { Box, Checkbox, Grid, Link, TextField, Typography } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ImageUploadButton from "../../ui/forms/ImageUploadButton";
 import { markdownGetReactDOMs } from "../../utils/markdownTools";
 
@@ -12,6 +12,7 @@ function MarkdownEditor({ initialValue, updateCallback }: {
     const [md, setMd] = useState(initialValue ?? '');
 
     const [enableRealtimePreview, setEnableRealtimePreview] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (updateCallback) {
@@ -20,11 +21,72 @@ function MarkdownEditor({ initialValue, updateCallback }: {
     }, [md, updateCallback]);
 
     const urlCallback = useCallback((url: string) => {
-        setMd((prev) => (
-            prev + '\n\n'
-            + `![image](${url})`
-        ))
-    }, []);
+        let select = inputRef.current?.selectionStart ?? -1;
+        setMd((prev) => {
+            if (!select) {
+                return (
+                    prev + '\n\n'
+                    + `![image](${url})`
+                );
+            }
+            return prev.substring(0, select) + `![image](${url})` + prev.substring(select);
+        }
+        )
+    }, [inputRef]);
+
+    const tabInsertHandler = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (!inputRef.current) return;
+        if (e.ctrlKey) return;
+        if (inputRef.current.selectionStart === null || inputRef.current.selectionEnd === null) return;
+        if (e.key === 'Tab') {
+            e.preventDefault();
+
+            if (e.shiftKey) {
+                /** 向前缩进 */
+                let select = inputRef.current.selectionStart;
+                let end = inputRef.current.selectionEnd;
+                let text = inputRef.current.value;
+                let check = text.substring(0, select).lastIndexOf('    ');
+                if (check === select - 4) {
+                    setMd(`${text.substring(0, select - 4)}${text.substring(select)}`);
+                    /** 不优雅，目前没找到更合理的实现方式。 */
+                    setTimeout(() => {
+                        if (inputRef.current) {
+                            inputRef.current.selectionStart = select - 4;
+                            inputRef.current.selectionEnd = end - 4;
+                        }
+                    }, 0);
+                    return;
+                }
+                let lines = text.split('\n');
+                let currentLine = text.substring(0, select).split('\n').length - 1;
+                if (lines[currentLine].startsWith('    ')) {
+                    lines[currentLine] = lines[currentLine].substring(4);
+                }
+                setMd(lines.join('\n'));
+                setTimeout(() => {
+                    if (inputRef.current) {
+                        inputRef.current.selectionStart = select - 4;
+                        inputRef.current.selectionEnd = end - 4;
+                    }
+                }, 0);
+                return;
+            } else {
+                /** 向后 >> */
+                let select = inputRef.current.selectionStart;
+                let end = inputRef.current.selectionEnd;
+                let text = inputRef.current.value;
+                setMd(`${text.substring(0, select)}    ${text.substring(select)}`);
+                /** 不优雅，目前没找到更合理的实现方式。 */
+                setTimeout(() => {
+                    if (inputRef.current) {
+                        inputRef.current.selectionStart = select + 4;
+                        inputRef.current.selectionEnd = end + 4;
+                    }
+                }, 0);
+            }
+        }
+    }, [inputRef]);
 
     return <Grid container spacing={2}>
         <Grid item xs={12} sm={enableRealtimePreview ? 6 : 12}>
@@ -77,7 +139,9 @@ function MarkdownEditor({ initialValue, updateCallback }: {
                     minRows={20}
                     autoComplete="off"
                     value={md}
+                    inputRef={inputRef}
                     onChange={(e) => setMd(e.target.value)}
+                    onKeyDown={tabInsertHandler}
                 />
 
             </Box>
