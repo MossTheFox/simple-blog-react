@@ -1,4 +1,4 @@
-import { Box, Container, Fade, Grid, Paper, Stack, Typography } from "@mui/material";
+import { Box, Container, Fade, Grid, Paper, Portal, Stack, Theme, Typography, useMediaQuery } from "@mui/material";
 import BlogCategoryNavigateCardUnit from "../ui/cards/BlogCategoryNavigateCardUnit";
 import BlogChipNavigate from "../ui/cards/BlogChipNavigate";
 import BlogSummaryCardMain from "../ui/cards/BlogSummaryCardMain";
@@ -11,7 +11,7 @@ import MainArticleList from "./articleList/MainArticleList";
 import AsyncLoadingHandler from "../hooks/AsyncLoadingHandler";
 import { APIService } from "../scripts/dataAPIInterface";
 import UserSideCard from "../ui/cards/UserSideCard";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 
 function MainPage() {
 
@@ -34,6 +34,11 @@ function MainPage() {
         </Fade>
     }, []);
 
+    const mobileUserDisplayContainerRef = useRef<HTMLDivElement>(null);
+    const regularUserContainer = useRef<HTMLDivElement>(null);
+
+    const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+
     return <>
         <NavBar showSearchBar />
 
@@ -48,13 +53,20 @@ function MainPage() {
                 <Grid container spacing={4}>
                     {/* 左栏: 近期文章 (所有文章 + 翻页) | 文章内容 | 按标签查找的文章 | 按作者查找的文章 | 按分类查找的文章 */}
                     <Grid item xs={12} sm={8}>
+                        <Box ref={mobileUserDisplayContainerRef} pb={isMobile ? 2 : 0} />
                         {Outlet({}) || <MainArticleList />}
                     </Grid>
 
                     {/* 右栏: 小型用户面板 + 分类 + 标签 */}
                     <Grid item xs={12} sm={4}>
 
-                        <UserSideCard />
+                        <Portal container={isMobile ? mobileUserDisplayContainerRef.current : regularUserContainer.current}>
+                            <UserSideCard />
+                        </Portal>
+
+                        <Box ref={regularUserContainer}>
+
+                        </Box>
 
                         <Box display="flex" alignItems="center" pb={1}>
                             <Folder fontSize="medium" sx={{ mr: 1 }} />

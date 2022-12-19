@@ -1,5 +1,5 @@
 import { Check, Clear } from "@mui/icons-material";
-import { Alert, Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, IconButton, Link, Snackbar, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, IconButton, Link, Menu, MenuItem, Snackbar, Typography } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
 import { Link as ReactRouterLink } from "react-router-dom";
 import { PLACEHOLDER_AVATAR_URL } from "../../constants";
@@ -70,7 +70,8 @@ function AdminSingleCommentCard({ comment, replyToTarget, actionEndCallback, und
         fireDelete();
     }, [fireDelete]);
 
-
+    const [open, setOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     return <Card>
         <DialogLoadingIndicator loading={loading} />
@@ -110,7 +111,7 @@ function AdminSingleCommentCard({ comment, replyToTarget, actionEndCallback, und
                 color="error"
                 children="删除"
                 disabled={loading}
-                onClick={deleteHandler}
+                onClick={(e) => { setAnchorEl(e.currentTarget); setOpen(true); }}
             />
             <Button variant="contained" startIcon={undoPassMode ? undefined : <Check />}
                 disabled={loading}
@@ -119,6 +120,11 @@ function AdminSingleCommentCard({ comment, replyToTarget, actionEndCallback, und
                 onClick={passHandler}
             />
         </CardActions>
+
+        <Menu open={open} anchorEl={anchorEl} onClose={(e) => setOpen(false)} >
+            <MenuItem disabled={loading} sx={{ color: (theme) => theme.palette.error.main }} onClick={deleteHandler}>确认删除</MenuItem>
+            <MenuItem onClick={() => setOpen(false)}>取消</MenuItem>
+        </Menu>
 
         <Snackbar open={notificationOpen} autoHideDuration={5000} onClose={() => setNotificationOpen(false)}
             anchorOrigin={{

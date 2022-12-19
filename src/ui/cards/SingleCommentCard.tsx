@@ -1,5 +1,5 @@
 import { Delete, Reply } from "@mui/icons-material";
-import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, IconButton, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, IconButton, Menu, MenuItem, Snackbar, Typography } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
 import { PLACEHOLDER_AVATAR_URL } from "../../constants";
 import { blogUserContext } from "../../context/userContext";
@@ -57,6 +57,8 @@ function SingleCommentCard({ comment, replyToTarget, actionEndCallback }: {
         fireDelete();
     }, [fireDelete]);
 
+    const [open, setOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     return <Card>
         <DialogLoadingIndicator loading={loading} />
@@ -93,12 +95,29 @@ function SingleCommentCard({ comment, replyToTarget, actionEndCallback }: {
                             size="small"
                             children="删除"
                             disabled={loading}
-                            onClick={deleteHandler}
+                            onClick={(e) => {
+                                setAnchorEl(e.currentTarget);
+                                setOpen(true);
+                            }}
                         />
                     )}
             </Box>
             <Button disabled variant="text" startIcon={<Reply />} children="回复" />
         </CardActions>
+
+        <Menu open={open} anchorEl={anchorEl} onClose={(e) => setOpen(false)} >
+            <MenuItem disabled={loading} sx={{ color: (theme) => theme.palette.error.main }} onClick={deleteHandler}>确认删除</MenuItem>
+            <MenuItem onClick={() => setOpen(false)}>取消</MenuItem>
+        </Menu>
+
+        <Snackbar open={notificationOpen} autoHideDuration={5000} onClose={() => setNotificationOpen(false)}
+            anchorOrigin={{
+                horizontal: 'center',
+                vertical: 'bottom'
+            }}>
+            <Alert severity={notification.severity} variant="filled">{notification.message}</Alert>
+        </Snackbar>
+
     </Card>
 }
 

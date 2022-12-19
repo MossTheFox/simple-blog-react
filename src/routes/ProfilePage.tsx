@@ -1,7 +1,7 @@
 import { ArrowBack } from "@mui/icons-material";
-import { Box, Button, Container, Divider, Grid, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Container, Divider, Grid, Link, Paper, Stack, TextField, Typography } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as ReactRouterLink } from "react-router-dom";
 import { blogUserContext } from "../context/userContext";
 import { TemplateOnErrorRender } from "../hooks/AsyncLoadingHandler";
 import useAsync from "../hooks/useAsync";
@@ -55,7 +55,26 @@ function ProfilePage() {
 
 
 
-    return user === 'Not Login' ? <></> : <>
+    return user === 'Not Login' ? <>
+        <Container maxWidth="md">
+            <Box py={10}>
+                <Paper>
+                    <Box px={2} py={4}>
+                        <Typography
+                            textAlign="center"
+                            variant="h5" fontWeight="bolder" gutterBottom>
+                            用户未登录
+                        </Typography>
+                        <Typography textAlign="center">
+                            你可以<Link component={ReactRouterLink} to="/"
+                                underline="hover"
+                            >点击这里来返回首页</Link>。
+                        </Typography>
+                    </Box>
+                </Paper>
+            </Box>
+        </Container>
+    </> : <>
         <NavBar showSearchBar />
         <Container maxWidth="lg">
             <Box py={2}>
