@@ -48,6 +48,7 @@ export function UserContextProvider({ children }: { children?: React.ReactNode }
             return {
                 ...blogUserContextBase,
                 ...prev,
+                ...data
             }
         });
     }, []);

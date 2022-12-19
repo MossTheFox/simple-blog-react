@@ -1,11 +1,9 @@
 import { Box, Collapse, Fade, Link, Pagination, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams, Link as ReactRouterLink } from 'react-router-dom';
 import { TemplateLoadingPlaceHolder, TemplateOnErrorRender } from "../../hooks/AsyncLoadingHandler";
 import useAsync from "../../hooks/useAsync";
 import { APIService } from "../../scripts/dataAPIInterface";
 import BlogSummaryCardMain from "../../ui/cards/BlogSummaryCardMain";
-import { blogSummaryTestData } from "../../_testData";
 
 type SearchQuery = {
     author: string;
@@ -14,8 +12,8 @@ type SearchQuery = {
     searchText: string;
 };
 
-function MainArticleList({ mode = 'all' }: {
-    mode?: 'all' | 'tag' | 'author' | 'category' | 'search'
+function MyArticlesSubPage({ username }: {
+    username: string
 }) {
 
     const [totalArticlesCount, setTotalArticlesCount] = useState(1);
@@ -23,24 +21,11 @@ function MainArticleList({ mode = 'all' }: {
     const totalPage = useMemo(() => Math.ceil(totalArticlesCount / perPage), [totalArticlesCount]);
     const [page, setPage] = useState(1);
 
-    const { authorName, categoryName, tagName, searchText } = useParams();
-
-    const [searchQuery, setSearchQuery] = useState<null | Partial<SearchQuery>>(null);
+    const searchQuery = useMemo<Partial<SearchQuery>>(() => ({ author: username }), [username]);
 
     const title = useMemo(() => {
-        switch (mode) {
-            case 'author':
-                return `作者: ${authorName}`;
-            case 'category':
-                return `分类: ${categoryName}`;
-            case 'tag':
-                return `标签: ${tagName}`;
-            case 'search':
-                return `搜索: ${searchText}`;
-            default:
-                return '所有文章';
-        }
-    }, [mode, authorName, categoryName, tagName, searchText]);
+        return `${username} 发布的文章`
+    }, [username]);
 
     const [articleList, setArticleList] = useState<BlogSummaryData[]>([]);
     const [loading, setLoading] = useState(true);
@@ -86,29 +71,6 @@ function MainArticleList({ mode = 'all' }: {
         fireFetchPageRerender();
     }, [fireFetchPageRerender, page]);
 
-    // 接管页面变化
-    useEffect(() => {
-        switch (mode) {
-            case 'author':
-                setSearchQuery({ author: authorName });
-                break;
-            case 'category':
-                setSearchQuery({ category: categoryName });
-                break;
-            case 'tag':
-                setSearchQuery({ tag: tagName });
-                break;
-            case 'search':
-                setSearchQuery({ searchText: searchText });
-                break;
-            default:
-                setSearchQuery(null);
-        }
-        setPage(1);
-        fireFetchPageRerender();
-    }, [mode, authorName, categoryName, tagName, searchText]);
-
-
     return <>
         <Typography variant="h5" fontWeight="bolder" gutterBottom
             sx={{
@@ -117,17 +79,7 @@ function MainArticleList({ mode = 'all' }: {
         >
             {title}
         </Typography>
-        {mode !== 'all' &&
-            <Typography variant="body2" gutterBottom
-                sx={{
-                    textIndent: (theme) => theme.spacing(2),
-                }}
-            >
-                <Link component={ReactRouterLink} underline="hover"
-                    to="/"
-                >返回所有文章列表</Link>
-            </Typography>
-        }
+
         <Box pb={2}>
             {/* 生命周期内会发生变化的组件，不使用 AsyncLoadingHandler */}
             {loading ? (<TemplateLoadingPlaceHolder />) : (
@@ -165,4 +117,4 @@ function MainArticleList({ mode = 'all' }: {
     </>
 }
 
-export default MainArticleList;
+export default MyArticlesSubPage;

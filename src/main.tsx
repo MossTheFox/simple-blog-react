@@ -8,6 +8,7 @@ import BlogPost from "./routes/blogPost/BlogPost";
 import BlogPostEditorPage from "./routes/editor/BlogPostEditorPage";
 import MainPage from "./routes/MainPage";
 import NotFound from "./routes/NotFound";
+import ProfilePage from "./routes/ProfilePage";
 import MainContainer from "./ui/MainContainer";
 import WrappedThemeProvider from "./ui/WrappedThemeProvider";
 
@@ -42,7 +43,7 @@ const router = createBrowserRouter([
     {
         // profile page
         path: '/my',
-        // element: 
+        element: <ProfilePage />,
         errorElement: <NotFound />,
     },
     {

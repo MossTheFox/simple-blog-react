@@ -29,6 +29,8 @@ export function TemplateOnErrorRender({ title, message = '未知错误', retryFu
  * 必须的字段: ```asyncFunc``` 与 ```OnSuccessRender```。
  * 
  * 留意: render 相关的参数接受的是一个返回 JSX.Element 的**函数**。
+ * 
+ * 注意: 为了避免不必要的 rerender，建议用 useCallback 装起来 onSuccessRender 这一类函数。
  */
 function AsyncLoadingHandler<T>({
     asyncFunc,

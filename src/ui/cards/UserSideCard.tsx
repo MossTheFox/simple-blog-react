@@ -1,7 +1,7 @@
 import { AccountCircle, ArrowBack, BorderColor } from "@mui/icons-material";
-import { Avatar, Box, Button, Collapse, Stack, Typography } from "@mui/material";
-import { useContext, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { Avatar, Box, Button, Collapse, Link, Stack, Typography } from "@mui/material";
+import { useCallback, useContext, useState } from "react";
+import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
 import { blogUserContext } from "../../context/userContext";
 import UserLoginForm from "../forms/UserLoginForm";
 import UserRegisterDialog from "../forms/UserRefgisterDialog";
@@ -16,8 +16,14 @@ function UserSideCard() {
 
     const navigate = useNavigate();
 
+    const handleUserProfileBoxNavigate = useCallback(() => {
+        if (user === 'Not Login') return;
+        navigate('/my');
+    }, [user, navigate]);
+
     return <Box pb={2}>
-        <Box display="flex" alignItems="center" pb={1}>
+        <Box display="flex" alignItems="center" pb={1}
+        >
             {typeof user === 'object' ? (
                 <Avatar alt={user.username} src={user.avatar} sx={{ width: '1.5rem', height: '1.5rem', mr: 1 }} />
             ) : (
@@ -25,7 +31,9 @@ function UserSideCard() {
             )}
 
             <Typography variant="h5" display="inline-block" fontWeight="bolder" alignContent="baseline">
-                {typeof user === 'object' ? user.username : '用户'}
+                {typeof user === 'object' ? (
+                    <Link component={ReactRouterLink} to="/my" underline="hover" children={user.username} />
+                ) : '用户'}
             </Typography>
         </Box>
 
@@ -51,8 +59,7 @@ function UserSideCard() {
                     onClick={() => navigate('/editor/new')}
                 />
                 <Button fullWidth startIcon={<AccountCircle />} children="个人信息" variant="contained"
-                    disabled    // TODO
-                    onClick={() => navigate('/my')}
+                    onClick={handleUserProfileBoxNavigate}
                 />
 
                 <Box textAlign="end">

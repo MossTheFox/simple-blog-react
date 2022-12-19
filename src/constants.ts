@@ -1,0 +1,1 @@
+export const PLACEHOLDER_AVATAR_URL = '/vite.svg';

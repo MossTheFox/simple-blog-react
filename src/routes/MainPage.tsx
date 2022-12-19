@@ -1,4 +1,4 @@
-import { Box, Container, Grid, Paper, Stack, Typography } from "@mui/material";
+import { Box, Container, Fade, Grid, Paper, Stack, Typography } from "@mui/material";
 import BlogCategoryNavigateCardUnit from "../ui/cards/BlogCategoryNavigateCardUnit";
 import BlogChipNavigate from "../ui/cards/BlogChipNavigate";
 import BlogSummaryCardMain from "../ui/cards/BlogSummaryCardMain";
@@ -11,8 +11,29 @@ import MainArticleList from "./articleList/MainArticleList";
 import AsyncLoadingHandler from "../hooks/AsyncLoadingHandler";
 import { APIService } from "../scripts/dataAPIInterface";
 import UserSideCard from "../ui/cards/UserSideCard";
+import { useCallback } from "react";
 
 function MainPage() {
+
+    const categoryComponentsRender = useCallback(({ data }: { data: CategoryListData }) => {
+        return <Fade in>
+            <Stack spacing={1} marginBottom={2}>
+                {data.map((v, i) =>
+                    <BlogCategoryNavigateCardUnit key={i}
+                        categoryRecord={v} />
+                )}
+            </Stack>
+        </Fade>
+    }, []);
+
+    const tafComponentsRender = useCallback(({ data }: { data: TagListData }) => {
+        return <Fade in>
+            <Box>
+                <BlogChipNavigate tagList={data} />
+            </Box>
+        </Fade>
+    }, []);
+
     return <>
         <NavBar showSearchBar />
 
@@ -43,14 +64,7 @@ function MainPage() {
                         </Box>
 
                         <AsyncLoadingHandler asyncFunc={APIService.getBlogCategoryList}
-                            OnSuccessRender={({ data }) => {
-                                return <Stack spacing={1} marginBottom={2}>
-                                    {data.map((v, i) =>
-                                        <BlogCategoryNavigateCardUnit key={i}
-                                            categoryRecord={v} />
-                                    )}
-                                </Stack>
-                            }} />
+                            OnSuccessRender={categoryComponentsRender} />
 
                         <Box display="flex" alignItems="center" pb={1}>
                             <LocalOffer fontSize="medium" sx={{ mr: 1 }} />
@@ -60,9 +74,7 @@ function MainPage() {
                         </Box>
 
                         <AsyncLoadingHandler asyncFunc={APIService.getBlogTagList}
-                            OnSuccessRender={({ data }) => {
-                                return <BlogChipNavigate tagList={data} />
-                            }} />
+                            OnSuccessRender={tafComponentsRender} />
 
                     </Grid>
                 </Grid>
