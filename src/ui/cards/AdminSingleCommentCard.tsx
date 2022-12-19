@@ -1,15 +1,17 @@
-import { Delete, Reply } from "@mui/icons-material";
-import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, IconButton, Typography } from "@mui/material";
+import { Check, Clear } from "@mui/icons-material";
+import { Alert, Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, IconButton, Link, Snackbar, Typography } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
+import { Link as ReactRouterLink } from "react-router-dom";
 import { blogUserContext } from "../../context/userContext";
 import useAsync from "../../hooks/useAsync";
 import { APIService } from "../../scripts/dataAPIInterface";
 import DialogLoadingIndicator from "../smallComponents/DialogLoadingIndicator";
 
-function SingleCommentCard({ comment, replyToTarget, actionEndCallback }: {
+function AdminSingleCommentCard({ comment, replyToTarget, actionEndCallback, undoPassMode = false }: {
     comment: BlogComment;
     replyToTarget?: BlogComment;
-    actionEndCallback?: () => void
+    actionEndCallback?: () => void;
+    undoPassMode?: boolean
 }) {
 
     const { user } = useContext(blogUserContext);
@@ -22,6 +24,10 @@ function SingleCommentCard({ comment, replyToTarget, actionEndCallback }: {
         severity: 'success',
         message: '?'
     });
+
+    const asyncHandlePass = useCallback(async () => {
+        return await APIService.adminValidateComment(comment.id, undoPassMode);
+    }, [comment, undoPassMode]);
 
     const asyncHandleDelete = useCallback(async () => {
         return await APIService.deleteComment(comment.id);
@@ -48,13 +54,21 @@ function SingleCommentCard({ comment, replyToTarget, actionEndCallback }: {
         });
     }, []);
 
+    const firePass = useAsync(asyncHandlePass, onSuccess, onError);
     const fireDelete = useAsync(asyncHandleDelete, onSuccess, onError);
+
+    const passHandler = useCallback(() => {
+        setLoading(true);
+        setError(null);
+        firePass();
+    }, [firePass]);
 
     const deleteHandler = useCallback(() => {
         setLoading(true);
         setError(null);
         fireDelete();
     }, [fireDelete]);
+
 
 
     return <Card>
@@ -70,10 +84,18 @@ function SingleCommentCard({ comment, replyToTarget, actionEndCallback }: {
             sx={{ pb: 1 }}
         />
         <CardContent sx={{ pt: 1 }}>
+            <Typography variant="body2" color="textSecondary" gutterBottom
+                children={
+                    <Link component={ReactRouterLink}
+                        to={`/blog/${comment.blogId}`}
+                        children={`文章编号: ${comment.blogId}`}
+                        underline='hover' />
+                } />
             {replyToTarget && (
                 <Typography variant="body2" color="textSecondary" gutterBottom
                     children={`回复: ${replyToTarget.user.username}`} />
             )}
+
             <Typography variant="body1" whiteSpace='pre-wrap'
                 children={comment.content} />
         </CardContent>
@@ -81,22 +103,28 @@ function SingleCommentCard({ comment, replyToTarget, actionEndCallback }: {
         <CardActions sx={{
             justifyContent: 'space-between'
         }}>
-            <Box>
-                {typeof user === 'object' && (
-                    user.username === comment.user.username || user.flags.includes('ADMIN')
-                ) && (
-                        <Button variant="text" startIcon={<Delete />}
-                            color="error"
-                            size="small"
-                            children="删除"
-                            disabled={loading}
-                            onClick={deleteHandler}
-                        />
-                    )}
-            </Box>
-            <Button disabled variant="text" startIcon={<Reply />} children="回复" />
+            <Button variant="text" startIcon={<Clear />}
+                color="error"
+                children="删除"
+                disabled={loading}
+                onClick={deleteHandler}
+            />
+            <Button variant="contained" startIcon={undoPassMode ? undefined : <Check />}
+                disabled={loading}
+                children={undoPassMode ? '设为待审核' : "通过"}
+                color={undoPassMode ? 'secondary' : 'primary'}
+                onClick={passHandler}
+            />
         </CardActions>
+
+        <Snackbar open={notificationOpen} autoHideDuration={5000} onClose={() => setNotificationOpen(false)}
+            anchorOrigin={{
+                horizontal: 'center',
+                vertical: 'bottom'
+            }}>
+            <Alert severity={notification.severity} variant="filled">{notification.message}</Alert>
+        </Snackbar>
     </Card>
 }
 
-export default SingleCommentCard;
+export default AdminSingleCommentCard;

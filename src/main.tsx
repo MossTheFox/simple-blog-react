@@ -3,6 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { UserContextProvider } from "./context/userContext";
+import AdminPage from "./routes/AdminPage";
 import MainArticleList from "./routes/articleList/MainArticleList";
 import BlogPost from "./routes/blogPost/BlogPost";
 import BlogPostEditorPage from "./routes/editor/BlogPostEditorPage";
@@ -44,6 +45,11 @@ const router = createBrowserRouter([
         // profile page
         path: '/my',
         element: <ProfilePage />,
+        errorElement: <NotFound />,
+    },
+    {
+        path: '/admin',
+        element: <AdminPage />,
         errorElement: <NotFound />,
     },
     {

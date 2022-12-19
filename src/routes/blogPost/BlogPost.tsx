@@ -72,9 +72,9 @@ function BlogPost() {
 
     useEffect(() => {
         if (allowComment === true) {
-            fireFetchComments();
+            handleFetchComment();
         }
-    }, [fireFetchComments, allowComment]);
+    }, [handleFetchComment, allowComment]);
 
     // 这样保证不会反复 rerender... 
     const onSuccessRender = useCallback(function BlogPostRender({ data }: { data: BlogPostData }) {
@@ -193,9 +193,13 @@ function BlogPost() {
                                 comments.map((v, i, arr) => {
                                     if (v.replyTo) {
                                         let found = arr.find((t) => t.id === v.replyTo);
-                                        return <SingleCommentCard key={i} comment={v} replyToTarget={found} />
+                                        return <SingleCommentCard key={i} comment={v} replyToTarget={found}
+                                            actionEndCallback={handleFetchComment}
+                                        />
                                     }
-                                    return <SingleCommentCard key={i} comment={v} />
+                                    return <SingleCommentCard key={i} comment={v}
+                                        actionEndCallback={handleFetchComment}
+                                    />
                                 })
                             )
                         )}

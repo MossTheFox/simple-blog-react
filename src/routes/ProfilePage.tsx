@@ -1,6 +1,7 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Container, Divider, Grid, Stack, TextField, Typography } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { blogUserContext } from "../context/userContext";
 import { TemplateOnErrorRender } from "../hooks/AsyncLoadingHandler";
 import useAsync from "../hooks/useAsync";
@@ -13,6 +14,8 @@ import MyArticlesSubPage from "./articleList/MyArticlesSubPage";
 function ProfilePage() {
 
     const { user, set } = useContext(blogUserContext);
+
+    const navigate = useNavigate();
 
     const [profieEdit, setProfileEdit] = useState(false);
 
@@ -79,6 +82,11 @@ function ProfilePage() {
                                 <Button fullWidth variant="contained" color="primary" sx={{ mb: 2 }}
                                     onClick={openProfileEdit}>编辑个人资料</Button>
 
+                                {user.flags.includes('ADMIN') &&
+                                    <Button fullWidth children="管理面板" variant="outlined"
+                                        onClick={() => navigate('/admin')}
+                                    />
+                                }
                             </>}
                             {profieEdit && <>
                                 <Stack spacing={2}>

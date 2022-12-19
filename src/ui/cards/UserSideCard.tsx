@@ -1,4 +1,4 @@
-import { AccountCircle, ArrowBack, BorderColor } from "@mui/icons-material";
+import { AccountCircle, AdminPanelSettings, ArrowBack, BorderColor } from "@mui/icons-material";
 import { Avatar, Box, Button, Collapse, Link, Stack, Typography } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
 import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
@@ -61,6 +61,11 @@ function UserSideCard() {
                 <Button fullWidth startIcon={<AccountCircle />} children="个人信息" variant="contained"
                     onClick={handleUserProfileBoxNavigate}
                 />
+                {user.flags.includes('ADMIN') &&
+                    <Button fullWidth startIcon={<AdminPanelSettings />} children="管理员页面" variant="outlined"
+                        onClick={() => navigate('/admin')}
+                    />
+                }
 
                 <Box textAlign="end">
                     <UserSignOffButton variant="text" size="small">注销登陆</UserSignOffButton>
