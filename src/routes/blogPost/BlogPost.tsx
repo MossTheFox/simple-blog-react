@@ -36,7 +36,8 @@ function BlogPost() {
     // 评论相关
     const [allowComment, setAllowComment] = useState<'pending' | boolean>('pending');
     const [commentPage, setCommentPage] = useState(1);
-    const [commentPerPage, setCommentPerPage] = useState(10);
+    // TODO: 分页
+    const [commentPerPage, setCommentPerPage] = useState(50);
     const [total, setTotal] = useState(0);
 
     const [loading, setLoading] = useState(true);

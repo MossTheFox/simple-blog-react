@@ -1,6 +1,7 @@
 import { Delete, Reply } from "@mui/icons-material";
 import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, IconButton, Typography } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
+import { PLACEHOLDER_AVATAR_URL } from "../../constants";
 import { blogUserContext } from "../../context/userContext";
 import useAsync from "../../hooks/useAsync";
 import { APIService } from "../../scripts/dataAPIInterface";
@@ -61,7 +62,9 @@ function SingleCommentCard({ comment, replyToTarget, actionEndCallback }: {
         <DialogLoadingIndicator loading={loading} />
         <CardHeader
             avatar={
-                <Avatar src={comment.user.avatar} />
+                <Avatar
+                    src={comment.user.avatar === PLACEHOLDER_AVATAR_URL ? PLACEHOLDER_AVATAR_URL : APIService.parseResourceUrl(comment.user.avatar)}
+                />
             }
             title={
                 <Typography fontWeight='bolder' children={comment.user.username} gutterBottom />

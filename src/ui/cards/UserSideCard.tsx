@@ -2,7 +2,9 @@ import { AccountCircle, AdminPanelSettings, ArrowBack, BorderColor } from "@mui/
 import { Avatar, Box, Button, Collapse, Link, Stack, Typography } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
 import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
+import { PLACEHOLDER_AVATAR_URL } from "../../constants";
 import { blogUserContext } from "../../context/userContext";
+import { APIService } from "../../scripts/dataAPIInterface";
 import UserLoginForm from "../forms/UserLoginForm";
 import UserRegisterDialog from "../forms/UserRefgisterDialog";
 import UserSignOffButton from "../forms/UserSignOffButton";
@@ -25,7 +27,9 @@ function UserSideCard() {
         <Box display="flex" alignItems="center" pb={1}
         >
             {typeof user === 'object' ? (
-                <Avatar alt={user.username} src={user.avatar} sx={{ width: '1.5rem', height: '1.5rem', mr: 1 }} />
+                <Avatar alt={user.username}
+                    src={user.avatar === PLACEHOLDER_AVATAR_URL ? PLACEHOLDER_AVATAR_URL : APIService.parseResourceUrl(user.avatar)}
+                    sx={{ width: '1.5rem', height: '1.5rem', mr: 1 }} />
             ) : (
                 <AccountCircle fontSize="medium" sx={{ mr: 1 }} />
             )}
