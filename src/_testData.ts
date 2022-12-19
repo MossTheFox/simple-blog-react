@@ -112,3 +112,15 @@ export const blogTagListTestData: TagListData = [
     }
 ];
 
+export const testComment: BlogComment = {
+    id: 1,
+    blogId: 48,
+    content: 'AAA\nBBB',
+    replyTo: null,
+    time: new Date(),
+    user: {
+        avatar: '/vite.svg',
+        signature: '啊',
+        username: '孙笑川'
+    }
+};

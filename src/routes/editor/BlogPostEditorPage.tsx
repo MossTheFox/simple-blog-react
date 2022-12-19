@@ -1,11 +1,12 @@
-import { Send, SettingsPowerRounded } from "@mui/icons-material";
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from "@mui/material";
+import { ArrowBack, Send, SettingsPowerRounded } from "@mui/icons-material";
+import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from "@mui/material";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { blogUserContext } from "../../context/userContext";
 import { TemplateOnErrorRender } from "../../hooks/AsyncLoadingHandler";
 import useAsync from "../../hooks/useAsync";
 import { APIService } from "../../scripts/dataAPIInterface";
+import NavBar from "../../ui/NavBar";
 import DialogLoadingIndicator from "../../ui/smallComponents/DialogLoadingIndicator";
 import BlogPostEditor, { initBlogEditorData } from "./BlogPostEditor";
 
@@ -118,6 +119,15 @@ function BlogPostEditorPage({ mode }: { mode: 'new' | 'edit' }) {
 
 
     return <>
+        <NavBar maxWidth="xl" position="static" />
+        <Box py={2}>
+            <Container maxWidth="xl">
+                <Button variant="outlined" startIcon={<ArrowBack />} children="返回首页"
+                    onClick={() => navigate('/', { replace: true })}
+                    size="small"
+                />
+            </Container>
+        </Box>
         <BlogPostEditor mode={mode} submitCallback={submitCallback} actionMenuCallback={actionMenuCallback} />
 
         <Dialog open={submitDialogOpen} fullWidth maxWidth='md' onClose={handleClose}>

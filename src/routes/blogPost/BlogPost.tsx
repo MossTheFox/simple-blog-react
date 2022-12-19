@@ -5,7 +5,9 @@ import { useParams, useNavigate, Link as ReactRouterLink } from 'react-router-do
 import { blogUserContext } from "../../context/userContext";
 import AsyncLoadingHandler from "../../hooks/AsyncLoadingHandler";
 import { APIService } from "../../scripts/dataAPIInterface";
+import SingleCommentCard from "../../ui/cards/SingleCommentCard";
 import { markdownGetReactDOMs } from "../../utils/markdownTools";
+import { testComment } from "../../_testData";
 
 function BlogPost() {
 
@@ -110,6 +112,9 @@ function BlogPost() {
                     </Box>
                 </Fade>;
             }} />
+
+            {/* 评论 */}
+            <SingleCommentCard comment={testComment} />
     </Box>
 }
 

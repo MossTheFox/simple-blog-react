@@ -138,7 +138,6 @@ function BlogPostEditor({ mode, submitCallback, actionMenuCallback }: {
     }, []);
 
     return <>
-        <NavBar maxWidth="xl" position="static" />
         <Container maxWidth="xl">
             <Box py={2}>
                 {loading && <TemplateLoadingPlaceHolder />}

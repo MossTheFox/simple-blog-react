@@ -61,3 +61,12 @@ type BlogUserData = {
 };
 
 type BlogUserContext = 'Not Login' | (BlogUserCore & BlogUserData);
+
+type BlogComment = {
+    id: number;
+    blogId: number;
+    replyTo: number | null;
+    content: string;
+    time: Date,
+    user: BlogUserData;
+};

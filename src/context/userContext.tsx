@@ -25,7 +25,7 @@ export const blogUserContext = createContext<{
     set: (data: Partial<BlogUserContext> | (string & BlogUserContext)) => void;
     init: () => void;
 }>({
-    user: blogUserContextBase,
+    user: 'Not Login',
     set: () => { throw new Error('Not implemented.') },
     init: () => { throw new Error('Not implemented.') }
 });
