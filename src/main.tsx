@@ -10,6 +10,7 @@ import BlogPostEditorPage from "./routes/editor/BlogPostEditorPage";
 import MainPage from "./routes/MainPage";
 import NotFound from "./routes/NotFound";
 import ProfilePage from "./routes/ProfilePage";
+import VisitorProfilePage from "./routes/VisitorProfilePage";
 import MainContainer from "./ui/MainContainer";
 import WrappedThemeProvider from "./ui/WrappedThemeProvider";
 
@@ -22,10 +23,6 @@ const router = createBrowserRouter([
             {
                 path: 'blog/:id',
                 element: <BlogPost />
-            },
-            {
-                path: 'author/:authorName',
-                element: <MainArticleList mode="author" />
             },
             {
                 path: 'category/:categoryName',
@@ -46,6 +43,10 @@ const router = createBrowserRouter([
         path: '/my',
         element: <ProfilePage />,
         errorElement: <NotFound />,
+    },
+    {
+        path: 'author/:username',
+        element: <VisitorProfilePage />
     },
     {
         path: '/admin',

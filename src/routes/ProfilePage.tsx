@@ -55,96 +55,98 @@ function ProfilePage() {
 
 
 
-    return user === 'Not Login' ? <>
-        <Container maxWidth="md">
-            <Box py={10}>
-                <Paper>
-                    <Box px={2} py={4}>
-                        <Typography
-                            textAlign="center"
-                            variant="h5" fontWeight="bolder" gutterBottom>
-                            用户未登录
-                        </Typography>
-                        <Typography textAlign="center">
-                            你可以<Link component={ReactRouterLink} to="/"
-                                underline="hover"
-                            >点击这里来返回首页</Link>。
-                        </Typography>
-                    </Box>
-                </Paper>
-            </Box>
-        </Container>
-    </> : <>
-        <NavBar showSearchBar />
-        <Container maxWidth="lg">
-            <Box py={2}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} sm={5} md={4} lg={3} justifyContent="center">
-                        <BigAvatar />
-                        <Divider />
-                        <DialogLoadingIndicator loading={loading} />
-
-                        <Box my={2}>
-
-                            {!profieEdit && <>
-                                <Typography variant="h5" fontWeight='bolder' gutterBottom>
-                                    {user.username}
-                                </Typography>
-                                <Typography variant="body2" gutterBottom>
-                                    {user.signature || '没有设置签名……'}
-                                </Typography>
-                                {user.flags.includes('ADMIN') && (
-                                    <Typography variant="body2" gutterBottom>
-                                        管理员
-                                    </Typography>
-                                )}
-                                <Button fullWidth variant="contained" color="primary" sx={{ mb: 2 }}
-                                    onClick={openProfileEdit}>编辑个人资料</Button>
-
-                                {user.flags.includes('ADMIN') &&
-                                    <Button fullWidth children="管理面板" variant="outlined"
-                                        onClick={() => navigate('/admin')}
-                                    />
-                                }
-                            </>}
-                            {profieEdit && <>
-                                <Stack spacing={2}>
-                                    <Box>
-                                        <Button variant="outlined"
-                                            onClick={() => setProfileEdit(false)}
-                                            disabled={loading}
-                                            startIcon={<ArrowBack />}
-                                            children="返回"
-                                        />
-                                    </Box>
-
-                                    <TextField label="个性签名" size="small"
-                                        value={sigInput}
-                                        autoComplete='off'
-                                        onChange={(e) => setSigInput(e.target.value)}
-                                        disabled={loading}
-                                    />
-
-                                    {error && <TemplateOnErrorRender
-                                        message={error.message}
-                                        retryFunc={handleSubmit} />}
-
-                                    <Button variant="contained"
-                                        children="更新"
-                                        disabled={loading}
-                                        onClick={handleSubmit}
-                                    />
-                                </Stack>
-                            </>
-                            }
+    return <>
+        {user === 'Not Login' ? <>
+            <Container maxWidth="md">
+                <Box py={10}>
+                    <Paper>
+                        <Box px={2} py={4}>
+                            <Typography
+                                textAlign="center"
+                                variant="h5" fontWeight="bolder" gutterBottom>
+                                用户未登录
+                            </Typography>
+                            <Typography textAlign="center">
+                                你可以<Link component={ReactRouterLink} to="/"
+                                    underline="hover"
+                                >点击这里来返回首页</Link>。
+                            </Typography>
                         </Box>
+                    </Paper>
+                </Box>
+            </Container>
+        </> : <>
+            <NavBar showSearchBar />
+            <Container maxWidth="lg">
+                <Box py={2}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={5} md={4} lg={3} justifyContent="center">
+                            <BigAvatar />
+                            <Divider />
+                            <DialogLoadingIndicator loading={loading} />
+
+                            <Box my={2}>
+
+                                {!profieEdit && <>
+                                    <Typography variant="h5" fontWeight='bolder' gutterBottom>
+                                        {user.username}
+                                    </Typography>
+                                    <Typography variant="body2" gutterBottom>
+                                        {user.signature || '没有设置签名……'}
+                                    </Typography>
+                                    {user.flags.includes('ADMIN') && (
+                                        <Typography variant="body2" gutterBottom>
+                                            管理员
+                                        </Typography>
+                                    )}
+                                    <Button fullWidth variant="contained" color="primary" sx={{ mb: 2 }}
+                                        onClick={openProfileEdit}>编辑个人资料</Button>
+
+                                    {user.flags.includes('ADMIN') &&
+                                        <Button fullWidth children="管理面板" variant="outlined"
+                                            onClick={() => navigate('/admin')}
+                                        />
+                                    }
+                                </>}
+                                {profieEdit && <>
+                                    <Stack spacing={2}>
+                                        <Box>
+                                            <Button variant="outlined"
+                                                onClick={() => setProfileEdit(false)}
+                                                disabled={loading}
+                                                startIcon={<ArrowBack />}
+                                                children="返回"
+                                            />
+                                        </Box>
+
+                                        <TextField label="个性签名" size="small"
+                                            value={sigInput}
+                                            autoComplete='off'
+                                            onChange={(e) => setSigInput(e.target.value)}
+                                            disabled={loading}
+                                        />
+
+                                        {error && <TemplateOnErrorRender
+                                            message={error.message}
+                                            retryFunc={handleSubmit} />}
+
+                                        <Button variant="contained"
+                                            children="更新"
+                                            disabled={loading}
+                                            onClick={handleSubmit}
+                                        />
+                                    </Stack>
+                                </>
+                                }
+                            </Box>
+                        </Grid>
+                        <Grid item xs={12} sm={7} md={8} lg={9}>
+                            <MyArticlesSubPage username={user.username} />
+                        </Grid>
                     </Grid>
-                    <Grid item xs={12} sm={7} md={8} lg={9}>
-                        <MyArticlesSubPage username={user.username} />
-                    </Grid>
-                </Grid>
-            </Box>
-        </Container>
+                </Box>
+            </Container>
+        </>}
     </>
 }
 

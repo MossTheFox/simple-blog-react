@@ -26,8 +26,8 @@ export const blogUserContext = createContext<{
     init: () => void;
 }>({
     user: 'Not Login',
-    set: () => { throw new Error('Not implemented.') },
-    init: () => { throw new Error('Not implemented.') }
+    set: () => { throw new Error('用户全局上下文异常 (blogUserContext ERROR)') },
+    init: () => { throw new Error('用户全局上下文异常 (blogUserContext ERROR)') }
 });
 
 export function UserContextProvider({ children }: { children?: React.ReactNode }) {
@@ -84,7 +84,7 @@ export function UserContextProvider({ children }: { children?: React.ReactNode }
     const fireOnce = useAsync(APIService.checkCurrentUser, onSuccess, onError);
 
     const init = useCallback(() => {
-        setUser('Not Login');
+        // setUser('Not Login');
         fireOnce();
     }, []);
 

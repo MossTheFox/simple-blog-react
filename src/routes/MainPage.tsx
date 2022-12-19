@@ -34,9 +34,6 @@ function MainPage() {
         </Fade>
     }, []);
 
-    const mobileUserDisplayContainerRef = useRef<HTMLDivElement>(null);
-    const regularUserContainer = useRef<HTMLDivElement>(null);
-
     const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
     return <>
@@ -53,20 +50,15 @@ function MainPage() {
                 <Grid container spacing={4}>
                     {/* 左栏: 近期文章 (所有文章 + 翻页) | 文章内容 | 按标签查找的文章 | 按作者查找的文章 | 按分类查找的文章 */}
                     <Grid item xs={12} sm={8}>
-                        <Box ref={mobileUserDisplayContainerRef} pb={isMobile ? 2 : 0} />
+                        <Box pb={isMobile ? 2 : 0} />
+                        {isMobile && <UserSideCard />}
                         {Outlet({}) || <MainArticleList />}
                     </Grid>
 
                     {/* 右栏: 小型用户面板 + 分类 + 标签 */}
                     <Grid item xs={12} sm={4}>
 
-                        <Portal container={isMobile ? mobileUserDisplayContainerRef.current : regularUserContainer.current}>
-                            <UserSideCard />
-                        </Portal>
-
-                        <Box ref={regularUserContainer}>
-
-                        </Box>
+                        {!isMobile && <UserSideCard />}
 
                         <Box display="flex" alignItems="center" pb={1}>
                             <Folder fontSize="medium" sx={{ mr: 1 }} />

@@ -18,7 +18,7 @@ function ErrorBox({ retryFunc,
                 <Button color="inherit" size="small" onClick={retryFunc}>{retryButtonText}</Button> : undefined
         }>
         {title &&
-            <AlertTitle>{title}</AlertTitle>
+            <AlertTitle sx={{ fontWeight: 'bolder' }} >{title}</AlertTitle>
         }
         {message ?? '出错'}
     </Alert>
