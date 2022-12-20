@@ -30,26 +30,56 @@ export const blogUserContext = createContext<{
     init: () => { throw new Error('用户全局上下文异常 (blogUserContext ERROR)') }
 });
 
-export function UserContextProvider({ children }: { children?: React.ReactNode }) {
-    const [user, setUser] = useState<BlogUserContext>('Not Login');
+// 本地缓存状态
+const localSaved: BlogUserContext = await (async () => {
+    try {
+        let data = localStorage.getItem('user-data-cache');
+        if (!data) return 'Not Login';
+        let parsed = JSON.parse(data);
+        if (!parsed || typeof parsed !== 'object') return 'Not Login';
+        if (
+            typeof parsed.id !== 'number'
+            || !Array.isArray(parsed.flags)
+            || typeof parsed.username !== 'string'
+            || typeof parsed.avatar !== 'string'
+            || typeof parsed.signature !== 'string'
+        ) return 'Not Login';
+        return {
+            ...blogUserContextBase,
+            ...parsed
+        }
+    } catch (err) {
+        return 'Not Login';
+    }
+})();
 
-    const set = useCallback((data: Partial<BlogUserContext> | (string & BlogUserContext)) => {
+
+export function UserContextProvider({ children }: { children?: React.ReactNode }) {
+    const [user, setUser] = useState<BlogUserContext>(localSaved);
+
+    const set = useCallback((data: Partial<BlogUserContext> | (string & BlogUserContext), appendToCache = true) => {
         if (typeof data === 'string') {
+            localStorage && localStorage.removeItem('user-data-cache');
             setUser(data);
             return;
         }
         setUser((prev) => {
             if (typeof prev === 'string') {
-                return {
+                const userObject = {
                     ...blogUserContextBase,
                     ...data
                 };
+                localStorage && localStorage.setItem('user-data-cache', JSON.stringify(userObject));
+
+                return userObject;
             }
-            return {
+            const userObject = {
                 ...blogUserContextBase,
                 ...prev,
                 ...data
-            }
+            };
+            localStorage && localStorage.setItem('user-data-cache', JSON.stringify(userObject));
+            return userObject;
         });
     }, []);
 
@@ -61,6 +91,7 @@ export function UserContextProvider({ children }: { children?: React.ReactNode }
 
     const onSuccess = useCallback((data: null | (BlogUserCore & BlogUserData)) => {
         if (data === null) {
+            localStorage && localStorage.removeItem('user-data-cache');
             setUser('Not Login');
             return;
         }
@@ -70,8 +101,11 @@ export function UserContextProvider({ children }: { children?: React.ReactNode }
                 ...data
             };
             if (userObject.id < 0) {
+                localStorage && localStorage.removeItem('user-data-cache');
                 return 'Not Login';
             }
+            // 保存
+            localStorage && localStorage.setItem('user-data-cache', JSON.stringify(userObject));
             return userObject;
         });
     }, []);
@@ -84,7 +118,6 @@ export function UserContextProvider({ children }: { children?: React.ReactNode }
     const fireOnce = useAsync(APIService.checkCurrentUser, onSuccess, onError);
 
     const init = useCallback(() => {
-        // setUser('Not Login');
         fireOnce();
     }, []);
 

@@ -79,14 +79,21 @@ function MarkdownAutosaveDrawer({
                 {loading && <TemplateLoadingPlaceHolder />}
 
                 {!loading && !err && (
-                    data.map((v, i) => (
-                        <ListItemButton key={i}
-                            onClick={handleDialogOpen.bind(null, i)}
-                        >
-                            {`${new Date(v.unixTime).toLocaleString()}: ${v.data.length > 25 ? (
-                                v.data.substring(0, 20) + '...') : v.data}`}
-                        </ListItemButton>
-                    ))
+                    data.length ? (
+
+                        data.map((v, i) => (
+                            <ListItemButton key={i}
+                                onClick={handleDialogOpen.bind(null, i)}
+                            >
+                                {`${new Date(v.unixTime).toLocaleString()}: ${v.data.length > 25 ? (
+                                    v.data.substring(0, 20) + '...') : v.data}`}
+                            </ListItemButton>
+                        ))
+                    ) : (
+                        <ListItemText color="textSecondary"
+                            sx={{ px: 2 }}
+                        >没有自动保存的记录。</ListItemText>
+                    )
                 )}
             </List>
             {err &&
