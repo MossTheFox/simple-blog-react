@@ -1,7 +1,9 @@
-import { Box, Checkbox, Grid, Link, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Grid, Link, TextField, Typography } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { MarkdownLocalCacheHandler } from "../../scripts/localDB";
 import ImageUploadButton from "../../ui/forms/ImageUploadButton";
 import { markdownGetReactDOMs } from "../../utils/markdownTools";
+import MarkdownAutosaveDrawer from "./MarkdownAutosaveDrawer";
 
 function MarkdownEditor({ initialValue, updateCallback }: {
     updateCallback?: (md: string) => void;
@@ -35,7 +37,7 @@ function MarkdownEditor({ initialValue, updateCallback }: {
                 inputRef.current.selectionEnd = inputRef.current.selectionStart;
             }
             return prev.substring(0, select) + imageTag + prev.substring(select);
-            
+
         }
         )
     }, [inputRef]);
@@ -94,6 +96,28 @@ function MarkdownEditor({ initialValue, updateCallback }: {
         }
     }, [inputRef]);
 
+    // 自动保存
+    const [autoSaveDrawerOpen, setAutoSaveDrawerOpen] = useState(false);
+    const appendRecord = useCallback((str: string) => {
+        setMd(str);
+        setAutoSaveDrawerOpen(false);
+    }, []);
+
+    useEffect(() => {
+        let interval = setInterval(async () => {
+            if (inputRef.current && inputRef.current.value.trim().length > 10) {
+                try {
+                    await MarkdownLocalCacheHandler.pushMarkdownCache(inputRef.current.value);
+                } catch (err) {
+                    import.meta.env.DEV && console.log(err);
+                }
+            }
+        }, 15 * 1000);
+        return () => {
+            clearInterval(interval);
+        };
+    }, [inputRef])
+
     return <Grid container spacing={2}>
         <Grid item xs={12} sm={enableRealtimePreview ? 6 : 12}>
             <Box display='flex' justifyContent='space-between'>
@@ -118,9 +142,11 @@ function MarkdownEditor({ initialValue, updateCallback }: {
                     </Box>
                 }
             </Box>
-            <Box py={1}>
+            <Box py={1} display="flex" justifyContent='space-between'>
                 <ImageUploadButton children="插入图片" urlCallback={urlCallback} />
+                <Button variant='text' onClick={() => setAutoSaveDrawerOpen(true)} children='查看自动保存历史' />
             </Box>
+            <MarkdownAutosaveDrawer open={autoSaveDrawerOpen} setOpen={setAutoSaveDrawerOpen} onReplaceCallback={appendRecord} />
         </Grid>
 
         <Grid item xs={12} sm={enableRealtimePreview ? 6 : 0} hidden={!enableRealtimePreview}>
