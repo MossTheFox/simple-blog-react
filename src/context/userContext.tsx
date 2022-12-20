@@ -31,7 +31,7 @@ export const blogUserContext = createContext<{
 });
 
 // 本地缓存状态
-const localSaved: BlogUserContext = await (async () => {
+const localSaved: BlogUserContext = (() => {
     try {
         let data = localStorage.getItem('user-data-cache');
         if (!data) return 'Not Login';
