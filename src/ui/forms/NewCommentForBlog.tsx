@@ -5,34 +5,23 @@ import { TemplateOnErrorRender } from "../../hooks/AsyncLoadingHandler";
 import useAsync from "../../hooks/useAsync";
 import { APIService } from "../../scripts/dataAPIInterface";
 
-function NewCommentForBlog({ id, onSubmitCallback, replyTo, cancelReplyTo }: {
+function NewCommentForBlog({ id, onSubmitCallback }: {
     id: number,
-    replyTo?: { id: number; username: string; }
-    cancelReplyTo?: () => void
     onSubmitCallback: () => void
 }) {
 
     const { user } = useContext(blogUserContext);
 
-    const [replyTarget, setReplyTarget] = useState(-1);
 
     const [input, setInput] = useState('');
 
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState<Error | null>(null);
 
-    /** 危: replyTo 变化 */
     const asyncHandleSubmit = useCallback(async () => {
-        return await APIService.postComment(input, id, replyTarget > 0 ? replyTarget : undefined);
-    }, [replyTarget, input, id]);
+        return await APIService.postComment(input, id);
+    }, [input, id]);
 
-    useEffect(() => {
-        setErr(null);
-        setLoading(false);
-        if (replyTo) {
-            setReplyTarget(replyTo.id);
-        }
-    }, [replyTo]);
 
     const onSuccess = useCallback(() => {
         setLoading(false);
@@ -69,20 +58,10 @@ function NewCommentForBlog({ id, onSubmitCallback, replyTo, cancelReplyTo }: {
 
     return <Paper>
         <Box px={2} py={1}>
-            <Typography variant="body1" color="primary" fontWeight='bolder' gutterBottom>
+            <Typography variant="body1" color="primary" fontWeight='bolder' gutterBottom pb={1}>
                 {typeof user === 'object' ? '撰写评论' : '登录后可以发表评论'}
             </Typography>
             <Box mb={2}>
-                {replyTarget > 0 && (<>
-                    <Typography variant="body2" color='textSecondary'>
-                        {replyTo ? `回复: ${replyTo.username}` : ''}
-                    </Typography>
-                    <Link component='button' variant="body2" underline='hover' children="取消"
-                        onClick={() => { setReplyTarget(-1); cancelReplyTo && cancelReplyTo() }}
-                        disabled={loading}
-                    />
-                </>
-                )}
                 <TextField multiline rows={3} fullWidth
                     size="small"
                     aria-label="评论输入框"
@@ -100,7 +79,7 @@ function NewCommentForBlog({ id, onSubmitCallback, replyTo, cancelReplyTo }: {
                 <Typography variant="body2" color='textSecondary' gutterBottom>
                     {input.length}/100
                 </Typography>
-                <Button variant="text" children='发表评论' disabled={!input.length}
+                <Button variant="text" children='发表评论' disabled={!input.length || loading}
                     onClick={handleSubmit}
                 />
             </Box>

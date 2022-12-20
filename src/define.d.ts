@@ -69,4 +69,5 @@ type BlogComment = {
     content: string;
     time: Date,
     user: BlogUserData;
+    replyTarget?: BlogComment;
 };

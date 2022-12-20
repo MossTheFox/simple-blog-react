@@ -80,27 +80,31 @@ function AdminInspectCommentList({
             title={err.message} retryFunc={handleFetchComment} />}
         {!loading && !err && (
             <Fade in>
+                <Box>
 
-                <Stack spacing={1}>{
-                    comments.length === 0 ? (
-                        <Typography variant='body2' color="textSecondary" gutterBottom>
-                            {mode === 'toBeVerified' ? '没有待审核的评论。' : '还没有评论。'}
-                        </Typography>
-                    ) : (
-                        comments.map((v, i, arr) => {
-                            if (v.replyTo) {
-                                let found = arr.find((t) => t.id === v.replyTo);
-                                return <AdminSingleCommentCard key={i} comment={v} replyToTarget={found}
+                    <Stack spacing={1}>{
+                        comments.length === 0 ? (
+                            <Typography variant='body2' color="textSecondary" gutterBottom>
+                                {mode === 'toBeVerified' ? '没有待审核的评论。' : '还没有评论。'}
+                            </Typography>
+                        ) : (
+                            comments.map((v, i) => {
+                                return <AdminSingleCommentCard key={i} comment={v} replyToTarget={v.replyTarget}
+                                    replyTargetDeleted={!!(v.replyTo && !v.replyTarget)}
                                     undoPassMode={mode === 'verified'}
                                     actionEndCallback={handleFetchComment} />
-                            }
-                            return <AdminSingleCommentCard key={i} comment={v}
-                                undoPassMode={mode === 'verified'}
-                                actionEndCallback={handleFetchComment}
+                            })
+                        )}
+
+                    </Stack>
+                    {totalPage > 1 &&
+                        <Box py={2} display='flex' justifyContent='center'>
+                            <Pagination color="primary" page={commentPage} count={totalPage}
+                                onChange={(e, page) => handlePageChange(page)}
                             />
-                        })
-                    )}
-                </Stack>
+                        </Box>
+                    }
+                </Box>
             </Fade>
         )}
     </Box>

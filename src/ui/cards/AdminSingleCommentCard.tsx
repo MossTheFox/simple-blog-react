@@ -1,5 +1,5 @@
 import { Check, Clear } from "@mui/icons-material";
-import { Alert, Avatar, Box, Button, ButtonBase, Card, CardActions, CardContent, CardHeader, IconButton, Link, Menu, MenuItem, Snackbar, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Button, ButtonBase, Card, CardActions, CardContent, CardHeader, IconButton, Link, Menu, MenuItem, Paper, Snackbar, Typography } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
 import { PLACEHOLDER_AVATAR_URL } from "../../constants";
@@ -8,9 +8,10 @@ import useAsync from "../../hooks/useAsync";
 import { APIService } from "../../scripts/dataAPIInterface";
 import DialogLoadingIndicator from "../smallComponents/DialogLoadingIndicator";
 
-function AdminSingleCommentCard({ comment, replyToTarget, actionEndCallback, undoPassMode = false }: {
+function AdminSingleCommentCard({ comment, replyToTarget, replyTargetDeleted, actionEndCallback, undoPassMode = false }: {
     comment: BlogComment;
     replyToTarget?: BlogComment;
+    replyTargetDeleted?: boolean;
     actionEndCallback?: () => void;
     undoPassMode?: boolean
 }) {
@@ -110,9 +111,25 @@ function AdminSingleCommentCard({ comment, replyToTarget, actionEndCallback, und
                         underline='hover' />
                 } />
             {replyToTarget && (
-                <Typography variant="body2" color="textSecondary" gutterBottom
-                    children={`回复: ${replyToTarget.user.username}`} />
+                <Paper sx={{ backgroundColor: (theme) => theme.palette.action.hover }}>
+                    <Box p={1} mb={2}>
+                        <Typography variant="body2" fontWeight='bold' color="textSecondary" gutterBottom
+                            whiteSpace='pre-wrap'
+                            children={`回复 ${replyToTarget.user.username}:`} />
+                        <Typography variant="body2" color="textSecondary"
+                            whiteSpace='pre-wrap'
+                            children={`${replyToTarget.content}`} />
+                    </Box>
+                </Paper>
             )}
+            {!replyToTarget && replyTargetDeleted && <Paper sx={{ backgroundColor: (theme) => theme.palette.action.hover }}>
+                <Box p={1} mb={2}>
+                    <Typography variant="body2" color="textSecondary"
+                        whiteSpace='pre-wrap'
+                        children={`回复的评论不存在`} />
+                </Box>
+            </Paper>
+            }
 
             <Typography variant="body1" whiteSpace='pre-wrap'
                 children={comment.content} />

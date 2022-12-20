@@ -1,17 +1,19 @@
 import { Delete, Reply } from "@mui/icons-material";
-import { Alert, Avatar, Box, Button, ButtonBase, Card, CardActions, CardContent, CardHeader, Link, Menu, MenuItem, Snackbar, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Button, ButtonBase, Card, CardActions, CardContent, CardHeader, Collapse, Link, Menu, MenuItem, Paper, Snackbar, Typography } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
 import { PLACEHOLDER_AVATAR_URL } from "../../constants";
 import { blogUserContext } from "../../context/userContext";
 import useAsync from "../../hooks/useAsync";
 import { APIService } from "../../scripts/dataAPIInterface";
+import ReplyCommentSubComponent from "../forms/ReplyCommentSubComponent";
 import DialogLoadingIndicator from "../smallComponents/DialogLoadingIndicator";
 
-function SingleCommentCard({ comment, replyToTarget, actionEndCallback, replyAction }: {
+function SingleCommentCard({ comment, replyToTarget, replyTargetDeleted, actionEndCallback, replyAction }: {
     comment: BlogComment;
     replyToTarget?: BlogComment;
     actionEndCallback?: () => void;
+    replyTargetDeleted?: boolean;
     replyAction?: (data: { id: number; username: string; }) => void
 }) {
 
@@ -64,6 +66,24 @@ function SingleCommentCard({ comment, replyToTarget, actionEndCallback, replyAct
     const [open, setOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+    // 回复相关
+    const [openReplyField, setOpenReplyField] = useState(false);
+    const onSubmitCallback = useCallback(() => {
+        setOpenReplyField(false);
+        const message = (() => {
+            if (user === 'Not Login') return '?';
+            if (user.flags.includes('ADMIN')) {
+                return '发布成功，请记得前往审核页面通过自己的评论。';
+            }
+            return '发布成功，评论将在审核完成后显示。'
+        })();
+        setNotification({
+            severity: 'success',
+            message
+        });
+        setNotificationOpen(true);
+    }, [user]);
+
     return <Card>
         <DialogLoadingIndicator loading={loading} />
         <CardHeader
@@ -92,11 +112,35 @@ function SingleCommentCard({ comment, replyToTarget, actionEndCallback, replyAct
         />
         <CardContent sx={{ pt: 1 }}>
             {replyToTarget && (
-                <Typography variant="body2" color="textSecondary" gutterBottom
-                    children={`回复: ${replyToTarget.user.username}`} />
+                <Paper sx={{ backgroundColor: (theme) => theme.palette.action.hover }}>
+                    <Box p={1} mb={2}>
+                        <Typography variant="body2" fontWeight='bold' color="textSecondary" gutterBottom
+                            whiteSpace='pre-wrap'
+                            children={`回复 ${replyToTarget.user.username}:`} />
+                        <Typography variant="body2" color="textSecondary"
+                            whiteSpace='pre-wrap'
+                            children={`${replyToTarget.content}`} />
+                    </Box>
+                </Paper>
             )}
+            {!replyToTarget && replyTargetDeleted && <Paper sx={{ backgroundColor: (theme) => theme.palette.action.hover }}>
+                <Box p={1} mb={2}>
+                    <Typography variant="body2" color="textSecondary"
+                        whiteSpace='pre-wrap'
+                        children={`回复的评论不存在`} />
+                </Box>
+            </Paper>
+            }
             <Typography variant="body1" whiteSpace='pre-wrap'
                 children={comment.content} />
+
+            {/* 回复评论 */}
+            <Collapse in={openReplyField} unmountOnExit={false}>
+                <ReplyCommentSubComponent blogId={comment.blogId} replyId={comment.id}
+                    onSubmitCallback={onSubmitCallback}
+                />
+            </Collapse>
+
         </CardContent>
 
         <CardActions sx={{
@@ -118,11 +162,10 @@ function SingleCommentCard({ comment, replyToTarget, actionEndCallback, replyAct
                         />
                     )}
             </Box>
-            {replyAction && (
-                <Button variant="text" startIcon={<Reply />} children="回复"
-                    onClick={() => replyAction({ id: comment.id, username: comment.user.username })}
-                />
-            )}
+            <Button variant="text" startIcon={<Reply />} children="回复"
+                onClick={() => setOpenReplyField((prev) => !prev)}
+            />
+
         </CardActions>
 
         <Menu open={open} anchorEl={anchorEl} onClose={(e) => setOpen(false)} >

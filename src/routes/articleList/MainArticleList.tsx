@@ -142,6 +142,11 @@ function MainArticleList({ mode = 'all' }: {
                 >返回所有文章列表</Link>
             </Typography>
         }
+        {(totalPage > 1) && (
+            <Box pb={2} display='flex' alignItems='center' justifyContent='center'>
+                <Pagination color="primary" count={totalPage} page={page} onChange={(_, page) => pageChangeAction(page)} />
+            </Box>
+        )}
         <Box pb={2}>
             {/* 生命周期内会发生变化的组件，不使用 AsyncLoadingHandler */}
             {loading ? (<TemplateLoadingPlaceHolder />) : (
@@ -149,33 +154,36 @@ function MainArticleList({ mode = 'all' }: {
                     <TemplateOnErrorRender message={error.message} retryFunc={fireFetchPageRerender} />
                 ) : (
                     <Fade in>
-                        <Stack spacing={2}>
-                            {
-                                articleList.map((v, i) =>
-                                    <BlogSummaryCardMain key={i} blogSummaryData={v} />
-                                )
-                            }
+                        <Box>
 
-                            {articleList.length === 0 && (
-                                <Typography variant="body2" color="textSecondary" gutterBottom
-                                    sx={{
-                                        textIndent: (theme) => theme.spacing(2),
-                                    }}
-                                >
-                                    暂时还没有文章。
-                                </Typography>
+                            <Stack spacing={2}>
+                                {
+                                    articleList.map((v, i) =>
+                                        <BlogSummaryCardMain key={i} blogSummaryData={v} />
+                                    )
+                                }
+
+                                {articleList.length === 0 && (
+                                    <Typography variant="body2" color="textSecondary" gutterBottom
+                                        sx={{
+                                            textIndent: (theme) => theme.spacing(2),
+                                        }}
+                                    >
+                                        暂时还没有文章。
+                                    </Typography>
+                                )}
+                            </Stack>
+                            {(totalPage > 1) && (
+                                <Box py={2} display='flex' alignItems='center' justifyContent='center'>
+                                    <Pagination color="primary" count={totalPage} page={page} onChange={(_, page) => pageChangeAction(page)} />
+                                </Box>
                             )}
-                        </Stack>
+                        </Box>
                     </Fade>
 
                 )
             )}
         </Box>
-        {(totalPage > 1) && (
-            <Box py={2} display='flex' alignItems='center' justifyContent='center'>
-                <Pagination color="primary" count={totalPage} page={page} onChange={(_, page) => pageChangeAction(page)} />
-            </Box>
-        )}
     </>
 }
 

@@ -68,8 +68,6 @@ function BlogPostComment({
         </Typography>
         <Box pb={2}>
             <NewCommentForBlog id={blogId} onSubmitCallback={handleFetchComment}
-                replyTo={replyTarget || undefined}
-                cancelReplyTo={cancelReplyTo}
             />
         </Box>
 
@@ -86,29 +84,35 @@ function BlogPostComment({
             title={err.message} retryFunc={handleFetchComment} />}
 
         {!loading && !err && (
-            <Fade in>
-                <Stack spacing={1}>
-                    {comments.length === 0 ? (
-                        <Typography variant='body2' color="textSecondary" gutterBottom>
-                            还没有评论。
-                        </Typography>
-                    ) : (
-                        comments.map((v, i, arr) => {
-                            if (v.replyTo) {
-                                let found = arr.find((t) => t.id === v.replyTo);
-                                return <SingleCommentCard key={i} comment={v} replyToTarget={found}
+            <Box>
+
+                <Fade in>
+                    <Stack spacing={1}>
+                        {comments.length === 0 ? (
+                            <Typography variant='body2' color="textSecondary" gutterBottom>
+                                还没有评论。
+                            </Typography>
+                        ) : (
+                            comments.map((v, i) => {
+                                console.log(v);
+                                return <SingleCommentCard key={i} comment={v}
                                     actionEndCallback={handleFetchComment}
                                     replyAction={setReplyTarget}
+                                    replyToTarget={v.replyTarget || undefined}
+                                    replyTargetDeleted={!!(v.replyTo && !v.replyTarget)}
                                 />
-                            }
-                            return <SingleCommentCard key={i} comment={v}
-                                actionEndCallback={handleFetchComment}
-                                replyAction={setReplyTarget}
-                            />
-                        })
-                    )}
-                </Stack>
-            </Fade>
+                            })
+                        )}
+                    </Stack>
+                </Fade>
+                {totalPage > 1 &&
+                    <Box py={2} display='flex' justifyContent='center'>
+                        <Pagination color="primary" page={commentPage} count={totalPage}
+                            onChange={(e, page) => handlePageChange(page)}
+                        />
+                    </Box>
+                }
+            </Box>
         )}
     </Box>
 
