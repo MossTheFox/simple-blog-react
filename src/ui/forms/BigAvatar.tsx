@@ -140,6 +140,7 @@ function BigAvatar({
             </>
             }
             <input ref={ref} type='file' hidden
+                accept="image/*"
                 onChange={onChange}
             />
 

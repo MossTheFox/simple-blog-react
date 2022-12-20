@@ -5,9 +5,10 @@ import { TemplateOnErrorRender } from "../../hooks/AsyncLoadingHandler";
 import useAsync from "../../hooks/useAsync";
 import { APIService } from "../../scripts/dataAPIInterface";
 
-function NewCommentForBlog({ id, onSubmitCallback, replyTo }: {
+function NewCommentForBlog({ id, onSubmitCallback, replyTo, cancelReplyTo }: {
     id: number,
     replyTo?: { id: number; username: string; }
+    cancelReplyTo?: () => void
     onSubmitCallback: () => void
 }) {
 
@@ -72,14 +73,15 @@ function NewCommentForBlog({ id, onSubmitCallback, replyTo }: {
                 {typeof user === 'object' ? '撰写评论' : '登录后可以发表评论'}
             </Typography>
             <Box mb={2}>
-                <Typography variant="body2" color='textSecondary' gutterBottom>
-                    {replyTo ? `回复: ${replyTo.username}` : ''}
-                </Typography>
-                {replyTarget > 0 && (
+                {replyTarget > 0 && (<>
+                    <Typography variant="body2" color='textSecondary'>
+                        {replyTo ? `回复: ${replyTo.username}` : ''}
+                    </Typography>
                     <Link component='button' variant="body2" underline='hover' children="取消"
-                        onClick={() => setReplyTarget(-1)}
+                        onClick={() => { setReplyTarget(-1); cancelReplyTo && cancelReplyTo() }}
                         disabled={loading}
                     />
+                </>
                 )}
                 <TextField multiline rows={3} fullWidth
                     size="small"

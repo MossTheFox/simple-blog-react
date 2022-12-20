@@ -1,6 +1,6 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Container, Divider, Grid, Link, Paper, Stack, TextField, Typography } from "@mui/material";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate, Link as ReactRouterLink } from "react-router-dom";
 import { blogUserContext } from "../context/userContext";
 import { TemplateOnErrorRender } from "../hooks/AsyncLoadingHandler";
@@ -53,7 +53,9 @@ function ProfilePage() {
         fireOnce();
     }, [fireOnce]);
 
-
+    useEffect(() => {
+        scrollTo(0, 0);
+    }, []);
 
     return <>
         {user === 'Not Login' ? <>

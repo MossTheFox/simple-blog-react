@@ -1,5 +1,5 @@
 import { Box, Button, Container, Divider, Grid, Link, Paper, Typography } from "@mui/material";
-import { useCallback, useContext, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, Link as ReactRouterLink } from "react-router-dom";
 import { blogUserContext } from "../context/userContext";
 import NavBar from "../ui/NavBar";
@@ -25,6 +25,10 @@ function AdminPage() {
 
     const onCommentSelected = useCallback((comment: BlogComment) => {
 
+    }, []);
+
+    useEffect(() => {
+        scrollTo(0, 0);
     }, []);
 
 

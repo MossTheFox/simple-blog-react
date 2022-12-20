@@ -8,10 +8,11 @@ import useAsync from "../../hooks/useAsync";
 import { APIService } from "../../scripts/dataAPIInterface";
 import DialogLoadingIndicator from "../smallComponents/DialogLoadingIndicator";
 
-function SingleCommentCard({ comment, replyToTarget, actionEndCallback }: {
+function SingleCommentCard({ comment, replyToTarget, actionEndCallback, replyAction }: {
     comment: BlogComment;
     replyToTarget?: BlogComment;
-    actionEndCallback?: () => void
+    actionEndCallback?: () => void;
+    replyAction?: (data: { id: number; username: string; }) => void
 }) {
 
     const { user } = useContext(blogUserContext);
@@ -117,7 +118,11 @@ function SingleCommentCard({ comment, replyToTarget, actionEndCallback }: {
                         />
                     )}
             </Box>
-            <Button disabled variant="text" startIcon={<Reply />} children="回复" />
+            {replyAction && (
+                <Button variant="text" startIcon={<Reply />} children="回复"
+                    onClick={() => replyAction({ id: comment.id, username: comment.user.username })}
+                />
+            )}
         </CardActions>
 
         <Menu open={open} anchorEl={anchorEl} onClose={(e) => setOpen(false)} >

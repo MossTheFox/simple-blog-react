@@ -1,4 +1,4 @@
-import { Box, Pagination, Typography } from "@mui/material";
+import { Box, Fade, Pagination, Typography } from "@mui/material";
 import { Stack } from "@mui/system";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { TemplateLoadingPlaceHolder, TemplateOnErrorRender } from "../../hooks/AsyncLoadingHandler";
@@ -57,13 +57,19 @@ function BlogPostComment({
         handleFetchComment();
     }, [handleFetchComment]);
 
+    // 回复选择相关
+    const [replyTarget, setReplyTarget] = useState<null | { id: number; username: string; }>(null);
+
+    const cancelReplyTo = useCallback(() => setReplyTarget(null), []);
+
     return <Box>
         <Typography variant='h6' fontWeight='bolder' gutterBottom>
             文章评论 {total ? ` (${total})` : ''}
         </Typography>
         <Box pb={2}>
             <NewCommentForBlog id={blogId} onSubmitCallback={handleFetchComment}
-            // replyTo={}
+                replyTo={replyTarget || undefined}
+                cancelReplyTo={cancelReplyTo}
             />
         </Box>
 
@@ -75,30 +81,35 @@ function BlogPostComment({
             </Box>
         }
 
-        <Stack spacing={1}>
-            {loading && <TemplateLoadingPlaceHolder />}
-            {!loading && err && <TemplateOnErrorRender
-                title={err.message} retryFunc={handleFetchComment} />}
-            {!loading && !err && (
-                comments.length === 0 ? (
-                    <Typography variant='body2' color="textSecondary" gutterBottom>
-                        还没有评论。
-                    </Typography>
-                ) : (
-                    comments.map((v, i, arr) => {
-                        if (v.replyTo) {
-                            let found = arr.find((t) => t.id === v.replyTo);
-                            return <SingleCommentCard key={i} comment={v} replyToTarget={found}
+        {loading && <TemplateLoadingPlaceHolder />}
+        {!loading && err && <TemplateOnErrorRender
+            title={err.message} retryFunc={handleFetchComment} />}
+
+        {!loading && !err && (
+            <Fade in>
+                <Stack spacing={1}>
+                    {comments.length === 0 ? (
+                        <Typography variant='body2' color="textSecondary" gutterBottom>
+                            还没有评论。
+                        </Typography>
+                    ) : (
+                        comments.map((v, i, arr) => {
+                            if (v.replyTo) {
+                                let found = arr.find((t) => t.id === v.replyTo);
+                                return <SingleCommentCard key={i} comment={v} replyToTarget={found}
+                                    actionEndCallback={handleFetchComment}
+                                    replyAction={setReplyTarget}
+                                />
+                            }
+                            return <SingleCommentCard key={i} comment={v}
                                 actionEndCallback={handleFetchComment}
+                                replyAction={setReplyTarget}
                             />
-                        }
-                        return <SingleCommentCard key={i} comment={v}
-                            actionEndCallback={handleFetchComment}
-                        />
-                    })
-                )
-            )}
-        </Stack>
+                        })
+                    )}
+                </Stack>
+            </Fade>
+        )}
     </Box>
 
 }

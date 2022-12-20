@@ -1,6 +1,6 @@
 import { Box, Collapse, Fade, Link, Pagination, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams, Link as ReactRouterLink } from 'react-router-dom';
+import { useParams, Link as ReactRouterLink, useSearchParams } from 'react-router-dom';
 import { TemplateLoadingPlaceHolder, TemplateOnErrorRender } from "../../hooks/AsyncLoadingHandler";
 import useAsync from "../../hooks/useAsync";
 import { APIService } from "../../scripts/dataAPIInterface";
@@ -21,7 +21,17 @@ function MainArticleList({ mode = 'all' }: {
     const [totalArticlesCount, setTotalArticlesCount] = useState(1);
     const perPage = 10;
     const totalPage = useMemo(() => Math.ceil(totalArticlesCount / perPage), [totalArticlesCount]);
-    const [page, setPage] = useState(1);
+
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const [page, setPage] = useState<number>(+(searchParams.get('page') || 1));
+
+    // Fix 
+    useEffect(() => {
+        if (page > totalPage) {
+            setPage(totalPage);
+        }
+    }, [page, totalPage]);
 
     const { authorName, categoryName, tagName, searchText } = useParams();
 
@@ -77,13 +87,16 @@ function MainArticleList({ mode = 'all' }: {
 
     // 初次渲染
     useEffect(() => {
+        let page = +(searchParams.get('page') || 1);
+        setPage(page);
         fireFetchPageRerender();
-    }, [fireFetchPageRerender]);
+    }, [searchParams, fireFetchPageRerender]);
 
     const pageChangeAction = useCallback((v: number) => {
         if (v === page) return;
         setPage(v);
         fireFetchPageRerender();
+        setSearchParams({ page: v + '' })
     }, [fireFetchPageRerender, page]);
 
     // 接管页面变化
@@ -104,7 +117,8 @@ function MainArticleList({ mode = 'all' }: {
             default:
                 setSearchQuery(null);
         }
-        setPage(1);
+        let page = +(searchParams.get('page') || 1);
+        setPage(page);
         fireFetchPageRerender();
     }, [mode, authorName, categoryName, tagName, searchText]);
 

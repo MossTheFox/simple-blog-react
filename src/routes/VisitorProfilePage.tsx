@@ -1,5 +1,5 @@
 import { ArrowBack } from "@mui/icons-material";
-import { Box, Button, Container, Divider, Grid, Link, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Container, Divider, Fade, Grid, Link, Paper, Stack, TextField, Typography } from "@mui/material";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate, Link as ReactRouterLink, useParams } from "react-router-dom";
 import { PLACEHOLDER_AVATAR_URL } from "../constants";
@@ -65,9 +65,8 @@ function VisitorProfilePage() {
 
     useEffect(() => {
         handleFetchUser();
+        scrollTo(0, 0);
     }, []);
-
-
 
     return <>
         <NavBar showSearchBar />
@@ -81,31 +80,33 @@ function VisitorProfilePage() {
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={5} md={4} lg={3} justifyContent="center">
 
-                        {currentUser && <>
-                            <UserProfileAvatar
-                                src={currentUser.avatar === PLACEHOLDER_AVATAR_URL ? PLACEHOLDER_AVATAR_URL : APIService.parseResourceUrl(currentUser.avatar)}
-                                username={currentUser.username}
-                            />
-                            <Divider />
-                            <DialogLoadingIndicator loading={loading} />
+                        {currentUser && <Fade in>
+                            <Box>
+                                <UserProfileAvatar
+                                    src={currentUser.avatar === PLACEHOLDER_AVATAR_URL ? PLACEHOLDER_AVATAR_URL : APIService.parseResourceUrl(currentUser.avatar)}
+                                    username={currentUser.username}
+                                />
+                                <Divider />
+                                <DialogLoadingIndicator loading={loading} />
 
-                            <Box my={2}>
+                                <Box my={2}>
 
-                                {currentUser && <>
-                                    <Typography variant="h5" fontWeight='bolder' gutterBottom>
-                                        {currentUser.username}
-                                    </Typography>
-                                    <Typography variant="body2" gutterBottom>
-                                        {currentUser.signature || '没有设置签名……'}
-                                    </Typography>
-                                    {currentUser.flags.includes('ADMIN') && (
-                                        <Typography variant="body2" gutterBottom>
-                                            管理员
+                                    {currentUser && <>
+                                        <Typography variant="h5" fontWeight='bolder' gutterBottom>
+                                            {currentUser.username}
                                         </Typography>
-                                    )}
-                                </>}
+                                        <Typography variant="body2" gutterBottom>
+                                            {currentUser.signature || '没有设置签名……'}
+                                        </Typography>
+                                        {currentUser.flags.includes('ADMIN') && (
+                                            <Typography variant="body2" gutterBottom>
+                                                管理员
+                                            </Typography>
+                                        )}
+                                    </>}
+                                </Box>
                             </Box>
-                        </>}
+                        </Fade>}
                         {loading && <TemplateLoadingPlaceHolder />}
                         {error && <TemplateOnErrorRender
                             message={error.message}

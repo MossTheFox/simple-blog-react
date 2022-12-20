@@ -21,15 +21,21 @@ function MarkdownEditor({ initialValue, updateCallback }: {
     }, [md, updateCallback]);
 
     const urlCallback = useCallback((url: string) => {
-        let select = inputRef.current?.selectionStart ?? -1;
+        let select = inputRef.current?.selectionStart;
         setMd((prev) => {
-            if (!select) {
+            if (typeof select !== 'number') {
                 return (
                     prev + '\n\n'
                     + `![image](${url})`
                 );
             }
-            return prev.substring(0, select) + `![image](${url})` + prev.substring(select);
+            const imageTag = `![image](${url})`;
+            if (inputRef.current && inputRef.current.selectionStart !== null && inputRef.current.selectionEnd !== null) {
+                inputRef.current.selectionStart += imageTag.length;
+                inputRef.current.selectionEnd = inputRef.current.selectionStart;
+            }
+            return prev.substring(0, select) + imageTag + prev.substring(select);
+            
         }
         )
     }, [inputRef]);
