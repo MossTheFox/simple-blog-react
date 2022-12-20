@@ -93,7 +93,6 @@ function BlogPostComment({
                             </Typography>
                         ) : (
                             comments.map((v, i) => {
-                                console.log(v);
                                 return <SingleCommentCard key={i} comment={v}
                                     actionEndCallback={handleFetchComment}
                                     replyAction={setReplyTarget}
