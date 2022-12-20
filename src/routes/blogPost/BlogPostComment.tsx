@@ -84,9 +84,8 @@ function BlogPostComment({
             title={err.message} retryFunc={handleFetchComment} />}
 
         {!loading && !err && (
-            <Box>
-
-                <Fade in>
+            <Fade in>
+                <Box>
                     <Stack spacing={1}>
                         {comments.length === 0 ? (
                             <Typography variant='body2' color="textSecondary" gutterBottom>
@@ -104,17 +103,17 @@ function BlogPostComment({
                             })
                         )}
                     </Stack>
-                </Fade>
-                {totalPage > 1 &&
-                    <Box py={2} display='flex' justifyContent='center'>
-                        <Pagination color="primary" page={commentPage} count={totalPage}
-                            onChange={(e, page) => handlePageChange(page)}
-                        />
-                    </Box>
-                }
-            </Box>
+                    {totalPage > 1 &&
+                        <Box py={2} display='flex' justifyContent='center'>
+                            <Pagination color="primary" page={commentPage} count={totalPage}
+                                onChange={(e, page) => handlePageChange(page)}
+                            />
+                        </Box>
+                    }
+                </Box>
+            </Fade>
         )}
-    </Box>
+    </Box >
 
 }
 
