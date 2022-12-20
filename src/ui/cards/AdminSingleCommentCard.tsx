@@ -102,7 +102,7 @@ function AdminSingleCommentCard({ comment, replyToTarget, replyTargetDeleted, ac
             subheader={comment.user.signature}
             sx={{ pb: 1 }}
         />
-        <CardContent sx={{ pt: 1 }}>
+        <CardContent sx={{ py: 1 }}>
             <Typography variant="body2" color="textSecondary" gutterBottom
                 children={
                     <Link component={ReactRouterLink}
@@ -133,6 +133,11 @@ function AdminSingleCommentCard({ comment, replyToTarget, replyTargetDeleted, ac
 
             <Typography variant="body1" whiteSpace='pre-wrap'
                 children={comment.content} />
+
+            <Typography textAlign='end' color="textSecondary" variant="body2"
+                children={'发布于: ' + comment.time.toLocaleString()}
+            />
+
         </CardContent>
 
         <CardActions sx={{

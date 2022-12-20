@@ -58,9 +58,10 @@ function AdminInspectCommentList({
     }, [handleFetchComment, mode]);
 
     const handlePageChange = useCallback((newPage: number) => {
+        if (newPage === commentPage) return; 
         setCommentPage(newPage);
         handleFetchComment();
-    }, [handleFetchComment]);
+    }, [handleFetchComment, commentPage]);
 
     return <Box>
         <Typography variant="h5" fontWeight='bolder' gutterBottom>

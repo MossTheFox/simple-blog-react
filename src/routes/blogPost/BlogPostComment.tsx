@@ -53,9 +53,10 @@ function BlogPostComment({
     }, [handleFetchComment]);
 
     const handlePageChange = useCallback((newPage: number) => {
+        if (newPage === commentPage) return; 
         setCommentPage(newPage);
         handleFetchComment();
-    }, [handleFetchComment]);
+    }, [handleFetchComment, commentPage]);
 
     // 回复选择相关
     const [replyTarget, setReplyTarget] = useState<null | { id: number; username: string; }>(null);

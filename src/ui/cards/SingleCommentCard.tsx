@@ -110,7 +110,7 @@ function SingleCommentCard({ comment, replyToTarget, replyTargetDeleted, actionE
             subheader={comment.user.signature}
             sx={{ pb: 1 }}
         />
-        <CardContent sx={{ pt: 1 }}>
+        <CardContent sx={{ py: 1 }}>
             {replyToTarget && (
                 <Paper sx={{ backgroundColor: (theme) => theme.palette.action.hover }}>
                     <Box p={1} mb={2}>
@@ -132,9 +132,13 @@ function SingleCommentCard({ comment, replyToTarget, replyTargetDeleted, actionE
             </Paper>
             }
             <Typography variant="body1" whiteSpace='pre-wrap'
-                children={comment.content} />
+                children={comment.content} gutterBottom />
+            
+            <Typography textAlign='end' color="textSecondary" variant="body2"
+                children={'发布于: ' + comment.time.toLocaleString()}
+            />
 
-            {/* 回复评论 */}
+            {/* 回复评论输入框部分 */}
             <Collapse in={openReplyField} unmountOnExit={false}>
                 <ReplyCommentSubComponent blogId={comment.blogId} replyId={comment.id}
                     onSubmitCallback={onSubmitCallback}

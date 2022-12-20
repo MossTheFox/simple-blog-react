@@ -142,10 +142,11 @@ function MainArticleList({ mode = 'all' }: {
                 >返回所有文章列表</Link>
             </Typography>
         }
-        {(totalPage > 1) && (
+        {(totalPage > 1) && (<Fade in>
             <Box pb={2} display='flex' alignItems='center' justifyContent='center'>
                 <Pagination color="primary" count={totalPage} page={page} onChange={(_, page) => pageChangeAction(page)} />
             </Box>
+        </Fade>
         )}
         <Box pb={2}>
             {/* 生命周期内会发生变化的组件，不使用 AsyncLoadingHandler */}
