@@ -1,4 +1,4 @@
-import { Box, Pagination, Stack, Typography } from "@mui/material";
+import { Box, Fade, Pagination, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { TemplateLoadingPlaceHolder, TemplateOnErrorRender } from "../../hooks/AsyncLoadingHandler";
 import useAsync from "../../hooks/useAsync";
@@ -75,31 +75,34 @@ function AdminInspectCommentList({
             </Box>
         }
 
-        <Stack spacing={1}>
-            {loading && <TemplateLoadingPlaceHolder />}
-            {!loading && err && <TemplateOnErrorRender
-                title={err.message} retryFunc={handleFetchComment} />}
-            {!loading && !err && (
-                comments.length === 0 ? (
-                    <Typography variant='body2' color="textSecondary" gutterBottom>
-                        {mode === 'toBeVerified' ? '没有待审核的评论。' : '还没有评论。'}
-                    </Typography>
-                ) : (
-                    comments.map((v, i, arr) => {
-                        if (v.replyTo) {
-                            let found = arr.find((t) => t.id === v.replyTo);
-                            return <AdminSingleCommentCard key={i} comment={v} replyToTarget={found}
+        {loading && <TemplateLoadingPlaceHolder />}
+        {!loading && err && <TemplateOnErrorRender
+            title={err.message} retryFunc={handleFetchComment} />}
+        {!loading && !err && (
+            <Fade in>
+
+                <Stack spacing={1}>{
+                    comments.length === 0 ? (
+                        <Typography variant='body2' color="textSecondary" gutterBottom>
+                            {mode === 'toBeVerified' ? '没有待审核的评论。' : '还没有评论。'}
+                        </Typography>
+                    ) : (
+                        comments.map((v, i, arr) => {
+                            if (v.replyTo) {
+                                let found = arr.find((t) => t.id === v.replyTo);
+                                return <AdminSingleCommentCard key={i} comment={v} replyToTarget={found}
+                                    undoPassMode={mode === 'verified'}
+                                    actionEndCallback={handleFetchComment} />
+                            }
+                            return <AdminSingleCommentCard key={i} comment={v}
                                 undoPassMode={mode === 'verified'}
-                                actionEndCallback={handleFetchComment} />
-                        }
-                        return <AdminSingleCommentCard key={i} comment={v}
-                            undoPassMode={mode === 'verified'}
-                            actionEndCallback={handleFetchComment}
-                        />
-                    })
-                )
-            )}
-        </Stack>
+                                actionEndCallback={handleFetchComment}
+                            />
+                        })
+                    )}
+                </Stack>
+            </Fade>
+        )}
     </Box>
 }
 

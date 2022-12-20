@@ -10,8 +10,7 @@ let darkTheme = createTheme({
             main: "#ffc352"
         },
         error: {
-            main: "#ff6459",
-            contrastText: '#ffffff'
+            main: "#ff6459"
         },
         warning: {
             main: "#ff893b"

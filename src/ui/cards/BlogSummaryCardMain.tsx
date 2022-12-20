@@ -33,7 +33,7 @@ function BlogSummaryCardMain({ blogSummaryData }: {
                 {!!blogSummaryData.category && <>
                     {' │ '}
                     📂 分类: <Link component={ReactRouterLink} underline="hover"
-                        to={`/author/${encodeURI(blogSummaryData.category)}`}
+                        to={`/category/${encodeURI(blogSummaryData.category)}`}
                     >{blogSummaryData.category}</Link>
                 </>}
 

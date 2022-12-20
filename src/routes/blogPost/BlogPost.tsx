@@ -62,7 +62,7 @@ function BlogPost() {
                     {!!data.category && <>
                         {' │ '}
                         分类: <Link component={ReactRouterLink} underline="hover"
-                            to={`/author/${encodeURI(data.category)}`}
+                            to={`/category/${encodeURI(data.category)}`}
                         >{data.category}</Link>
                     </>}
                 </Typography>
