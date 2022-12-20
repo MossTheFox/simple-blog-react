@@ -122,7 +122,7 @@ function ProfilePage() {
                                         <TextField label="个性签名" size="small"
                                             value={sigInput}
                                             autoComplete='off'
-                                            onChange={(e) => setSigInput(e.target.value)}
+                                            onChange={(e) => setSigInput(e.target.value.substring(0, 200))}
                                             disabled={loading}
                                         />
 

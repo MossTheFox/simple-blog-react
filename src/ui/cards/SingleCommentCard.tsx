@@ -1,6 +1,7 @@
 import { Delete, Reply } from "@mui/icons-material";
-import { Alert, Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, IconButton, Menu, MenuItem, Snackbar, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Button, ButtonBase, Card, CardActions, CardContent, CardHeader, Link, Menu, MenuItem, Snackbar, Typography } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
+import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
 import { PLACEHOLDER_AVATAR_URL } from "../../constants";
 import { blogUserContext } from "../../context/userContext";
 import useAsync from "../../hooks/useAsync";
@@ -14,6 +15,8 @@ function SingleCommentCard({ comment, replyToTarget, actionEndCallback }: {
 }) {
 
     const { user } = useContext(blogUserContext);
+
+    const navigate = useNavigate();
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
@@ -64,12 +67,24 @@ function SingleCommentCard({ comment, replyToTarget, actionEndCallback }: {
         <DialogLoadingIndicator loading={loading} />
         <CardHeader
             avatar={
-                <Avatar
-                    src={comment.user.avatar === PLACEHOLDER_AVATAR_URL ? PLACEHOLDER_AVATAR_URL : APIService.parseResourceUrl(comment.user.avatar)}
-                />
+                <ButtonBase sx={{ borderRadius: '100%' }}
+                    onClick={() => navigate('/author/' + comment.user.username)}
+                >
+                    <Avatar
+                        src={comment.user.avatar === PLACEHOLDER_AVATAR_URL ? PLACEHOLDER_AVATAR_URL : APIService.parseResourceUrl(comment.user.avatar)}
+                    />
+                </ButtonBase>
             }
             title={
-                <Typography fontWeight='bolder' children={comment.user.username} gutterBottom />
+                <Typography fontWeight='bolder' children={
+                    <Link component={ReactRouterLink}
+                        to={'/author/' + comment.user.username}
+                        children={
+                            comment.user.username
+                        }
+                        underline='hover'
+                    />
+                } gutterBottom />
             }
             subheader={comment.user.signature}
             sx={{ pb: 1 }}

@@ -1,18 +1,21 @@
-import { Box, Stack, Typography } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { Box, Pagination, Typography } from "@mui/material";
+import { Stack } from "@mui/system";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { TemplateLoadingPlaceHolder, TemplateOnErrorRender } from "../../hooks/AsyncLoadingHandler";
 import useAsync from "../../hooks/useAsync";
 import { APIService } from "../../scripts/dataAPIInterface";
-import AdminSingleCommentCard from "../../ui/cards/AdminSingleCommentCard";
+import SingleCommentCard from "../../ui/cards/SingleCommentCard";
+import NewCommentForBlog from "../../ui/forms/NewCommentForBlog";
 
-function PassedCommentList({
-    selectCallback
+function BlogPostComment({
+    blogId
 }: {
-    selectCallback: (comment: BlogComment) => void
+    blogId: number;
 }) {
     const [commentPage, setCommentPage] = useState(1);
-    const [commentPerPage, setCommentPerPage] = useState(50);
+    const [commentPerPage, setCommentPerPage] = useState(15);
     const [total, setTotal] = useState(0);
+    const totalPage = useMemo(() => Math.ceil(total / commentPerPage), [total, commentPerPage]);
 
     const [loading, setLoading] = useState(true);
     const [err, setErr] = useState<null | Error>(null);
@@ -20,8 +23,9 @@ function PassedCommentList({
     const [comments, setComments] = useState<BlogComment[]>([]);
 
     const asyncGetCommentData = useCallback(async () => {
-        return await APIService.getVerifiedComments(commentPage, commentPerPage);
-    }, [commentPerPage, commentPage]);
+        if ((Number.isNaN(blogId))) throw new Error('无效的文章 ID。');
+        return await APIService.getCommentsForBlog(blogId, commentPage, commentPerPage);
+    }, [blogId, commentPerPage, commentPage]);
 
 
     const getCommentOnSuccess = useCallback((data: Awaited<ReturnType<typeof asyncGetCommentData>>) => {
@@ -48,10 +52,28 @@ function PassedCommentList({
         handleFetchComment();
     }, [handleFetchComment]);
 
+    const handlePageChange = useCallback((newPage: number) => {
+        setCommentPage(newPage);
+        handleFetchComment();
+    }, [handleFetchComment]);
+
     return <Box>
-        <Typography variant="h5" fontWeight='bolder' gutterBottom>
-            已通过的评论
+        <Typography variant='h6' fontWeight='bolder' gutterBottom>
+            文章评论 {total ? ` (${total})` : ''}
         </Typography>
+        <Box pb={2}>
+            <NewCommentForBlog id={blogId} onSubmitCallback={handleFetchComment}
+            // replyTo={}
+            />
+        </Box>
+
+        {totalPage > 1 &&
+            <Box pb={2} display='flex' justifyContent='center'>
+                <Pagination color="primary" page={commentPage} count={totalPage}
+                    onChange={(e, page) => handlePageChange(page)}
+                />
+            </Box>
+        }
 
         <Stack spacing={1}>
             {loading && <TemplateLoadingPlaceHolder />}
@@ -66,19 +88,19 @@ function PassedCommentList({
                     comments.map((v, i, arr) => {
                         if (v.replyTo) {
                             let found = arr.find((t) => t.id === v.replyTo);
-                            return <AdminSingleCommentCard key={i} comment={v} replyToTarget={found}
+                            return <SingleCommentCard key={i} comment={v} replyToTarget={found}
                                 actionEndCallback={handleFetchComment}
-                                undoPassMode
                             />
                         }
-                        return <AdminSingleCommentCard key={i} comment={v} actionEndCallback={handleFetchComment}
-                            undoPassMode
+                        return <SingleCommentCard key={i} comment={v}
+                            actionEndCallback={handleFetchComment}
                         />
                     })
                 )
             )}
         </Stack>
     </Box>
+
 }
 
-export default PassedCommentList;
+export default BlogPostComment;

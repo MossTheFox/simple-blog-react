@@ -8,7 +8,6 @@ import { TemplateLoadingPlaceHolder, TemplateOnErrorRender } from "../hooks/Asyn
 import useAsync from "../hooks/useAsync";
 import { APIService } from "../scripts/dataAPIInterface";
 import UserProfileAvatar from "../ui/decorations/UserProfileAvatar";
-import BigAvatar from "../ui/forms/BigAvatar";
 import NavBar from "../ui/NavBar";
 import DialogLoadingIndicator from "../ui/smallComponents/DialogLoadingIndicator";
 import MyArticlesSubPage from "./articleList/MyArticlesSubPage";

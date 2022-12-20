@@ -1,18 +1,23 @@
-import { Box, Stack, Typography } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { Box, Pagination, Stack, Typography } from "@mui/material";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { TemplateLoadingPlaceHolder, TemplateOnErrorRender } from "../../hooks/AsyncLoadingHandler";
 import useAsync from "../../hooks/useAsync";
 import { APIService } from "../../scripts/dataAPIInterface";
 import AdminSingleCommentCard from "../../ui/cards/AdminSingleCommentCard";
 
-function ToBeVerifiedCommentList({
-    selectCallback
+function AdminInspectCommentList({
+    selectCallback,
+    mode
 }: {
-    selectCallback: (comment: BlogComment) => void
+    selectCallback: (comment: BlogComment) => void,
+    mode: 'verified' | 'toBeVerified'
 }) {
+    const [workMode, setWorkMode] = useState<typeof mode>(mode);
+
     const [commentPage, setCommentPage] = useState(1);
-    const [commentPerPage, setCommentPerPage] = useState(50);
+    const [commentPerPage, setCommentPerPage] = useState(15);
     const [total, setTotal] = useState(0);
+    const totalPage = useMemo(() => Math.ceil(total / commentPerPage), [total, commentPerPage]);
 
     const [loading, setLoading] = useState(true);
     const [err, setErr] = useState<null | Error>(null);
@@ -20,8 +25,11 @@ function ToBeVerifiedCommentList({
     const [comments, setComments] = useState<BlogComment[]>([]);
 
     const asyncGetCommentData = useCallback(async () => {
+        if (workMode === 'verified') {
+            return await APIService.getVerifiedComments(commentPage, commentPerPage);
+        }
         return await APIService.getToBeVerifiedComments(commentPage, commentPerPage);
-    }, [commentPerPage, commentPage]);
+    }, [commentPerPage, commentPage, workMode]);
 
 
     const getCommentOnSuccess = useCallback((data: Awaited<ReturnType<typeof asyncGetCommentData>>) => {
@@ -45,13 +53,27 @@ function ToBeVerifiedCommentList({
     }, [fireFetchComments]);
 
     useEffect(() => {
+        setWorkMode(mode);
+        handleFetchComment();
+    }, [handleFetchComment, mode]);
+
+    const handlePageChange = useCallback((newPage: number) => {
+        setCommentPage(newPage);
         handleFetchComment();
     }, [handleFetchComment]);
 
     return <Box>
         <Typography variant="h5" fontWeight='bolder' gutterBottom>
-            待审核的评论
+            {mode === 'toBeVerified' ? '待审核的评论' : '已通过的评论'}
         </Typography>
+
+        {totalPage > 1 &&
+            <Box pb={2} display='flex' justifyContent='center'>
+                <Pagination color="primary" page={commentPage} count={totalPage}
+                    onChange={(e, page) => handlePageChange(page)}
+                />
+            </Box>
+        }
 
         <Stack spacing={1}>
             {loading && <TemplateLoadingPlaceHolder />}
@@ -60,16 +82,18 @@ function ToBeVerifiedCommentList({
             {!loading && !err && (
                 comments.length === 0 ? (
                     <Typography variant='body2' color="textSecondary" gutterBottom>
-                        没有待审核的评论。
+                        {mode === 'toBeVerified' ? '没有待审核的评论。' : '还没有评论。'}
                     </Typography>
                 ) : (
                     comments.map((v, i, arr) => {
                         if (v.replyTo) {
                             let found = arr.find((t) => t.id === v.replyTo);
                             return <AdminSingleCommentCard key={i} comment={v} replyToTarget={found}
+                                undoPassMode={mode === 'verified'}
                                 actionEndCallback={handleFetchComment} />
                         }
                         return <AdminSingleCommentCard key={i} comment={v}
+                            undoPassMode={mode === 'verified'}
                             actionEndCallback={handleFetchComment}
                         />
                     })
@@ -79,4 +103,4 @@ function ToBeVerifiedCommentList({
     </Box>
 }
 
-export default ToBeVerifiedCommentList;
+export default AdminInspectCommentList;

@@ -1,15 +1,12 @@
 import { ArrowBack, Edit } from "@mui/icons-material";
-import { Box, Button, Divider, Fade, Link, Stack, Typography } from "@mui/material";
+import { Box, Button, Divider, Fade, Link, Typography } from "@mui/material";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useParams, useNavigate, Link as ReactRouterLink } from 'react-router-dom';
 import { blogUserContext } from "../../context/userContext";
-import AsyncLoadingHandler, { TemplateLoadingPlaceHolder, TemplateOnErrorRender } from "../../hooks/AsyncLoadingHandler";
-import useAsync from "../../hooks/useAsync";
+import AsyncLoadingHandler from "../../hooks/AsyncLoadingHandler";
 import { APIService } from "../../scripts/dataAPIInterface";
-import SingleCommentCard from "../../ui/cards/SingleCommentCard";
-import NewCommentForBlog from "../../ui/forms/NewCommentForBlog";
 import { markdownGetReactDOMs } from "../../utils/markdownTools";
-import { testComment } from "../../_testData";
+import BlogPostComment from "./BlogPostComment";
 
 function BlogPost() {
 
@@ -35,47 +32,7 @@ function BlogPost() {
 
     // 评论相关
     const [allowComment, setAllowComment] = useState<'pending' | boolean>('pending');
-    const [commentPage, setCommentPage] = useState(1);
-    // TODO: 分页
-    const [commentPerPage, setCommentPerPage] = useState(50);
-    const [total, setTotal] = useState(0);
 
-    const [loading, setLoading] = useState(true);
-    const [err, setErr] = useState<null | Error>(null);
-
-    const [comments, setComments] = useState<BlogComment[]>([]);
-
-    const asyncGetCommentData = useCallback(async () => {
-        if (!id || (Number.isNaN(+id))) throw new Error('无效的文章 ID。');
-        return await APIService.getCommentsForBlog(+id, commentPage, commentPerPage);
-    }, [id, commentPerPage, commentPage]);
-
-
-    const getCommentOnSuccess = useCallback((data: Awaited<ReturnType<typeof asyncGetCommentData>>) => {
-        setLoading(false);
-        setErr(null);
-        setTotal(data.total);
-        setComments(data.data);
-    }, []);
-
-    const getCommentOnError = useCallback((e: Error) => {
-        setLoading(false);
-        setErr(e);
-    }, []);
-
-    const fireFetchComments = useAsync(asyncGetCommentData, getCommentOnSuccess, getCommentOnError);
-
-    const handleFetchComment = useCallback(() => {
-        setLoading(true);
-        setErr(null);
-        fireFetchComments();
-    }, [fireFetchComments]);
-
-    useEffect(() => {
-        if (allowComment === true) {
-            handleFetchComment();
-        }
-    }, [handleFetchComment, allowComment]);
 
     // 这样保证不会反复 rerender... 
     const onSuccessRender = useCallback(function BlogPostRender({ data }: { data: BlogPostData }) {
@@ -143,6 +100,7 @@ function BlogPost() {
         </Fade>;
     }, [setShowEditButton, setAllowComment]);
 
+    /** 选择评论回复会用的部分 */
 
     return <Box>
         <Box pb={2} display="flex" justifyContent='space-between'>
@@ -170,42 +128,9 @@ function BlogPost() {
         </Box>
 
         {/* 评论 */}
-        {/* 要测试能不能套…… */}
         <Box pb={2}>
             {typeof allowComment === 'boolean' && <>
-                {allowComment ? (<>
-                    <Typography variant='h6' fontWeight='bolder' gutterBottom>
-                        文章评论 {total ? ` (${total})` : ''}
-                    </Typography>
-                    <Box pb={2}>
-                        <NewCommentForBlog id={id ? +id : -1} onSubmitCallback={handleFetchComment} />
-                    </Box>
-
-                    <Stack spacing={1}>
-                        {loading && <TemplateLoadingPlaceHolder />}
-                        {!loading && err && <TemplateOnErrorRender
-                            title={err.message} retryFunc={handleFetchComment} />}
-                        {!loading && !err && (
-                            comments.length === 0 ? (
-                                <Typography variant='body2' color="textSecondary" gutterBottom>
-                                    还没有评论。
-                                </Typography>
-                            ) : (
-                                comments.map((v, i, arr) => {
-                                    if (v.replyTo) {
-                                        let found = arr.find((t) => t.id === v.replyTo);
-                                        return <SingleCommentCard key={i} comment={v} replyToTarget={found}
-                                            actionEndCallback={handleFetchComment}
-                                        />
-                                    }
-                                    return <SingleCommentCard key={i} comment={v}
-                                        actionEndCallback={handleFetchComment}
-                                    />
-                                })
-                            )
-                        )}
-                    </Stack>
-                </>
+                {(id && allowComment) ? (<BlogPostComment blogId={+id} />
                 ) : (
                     <Typography variant='body2' color="textSecondary" gutterBottom>
                         评论已关闭

@@ -1,11 +1,9 @@
-import { Box, Button, Container, Divider, Grid, Typography } from "@mui/material";
+import { Box, Button, Container, Divider, Grid, Link, Paper, Typography } from "@mui/material";
 import { useCallback, useContext, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as ReactRouterLink } from "react-router-dom";
 import { blogUserContext } from "../context/userContext";
 import NavBar from "../ui/NavBar";
-import PassedCommentList from "./admin/PassedCommentList";
-import ToBeVerifiedCommentList from "./admin/ToBeVerifiedCommentList";
-
+import AdminInspectCommentList from "./admin/AdminInspectCommentList";
 function AdminPage() {
 
     const { user, set } = useContext(blogUserContext);
@@ -30,16 +28,35 @@ function AdminPage() {
     }, []);
 
 
-    return user === 'Not Login' ? <></> : <>
+    return (user === 'Not Login' || !user.flags.includes('ADMIN')) ? <>
+        <Container maxWidth="md">
+            <Box py={10}>
+                <Paper>
+                    <Box px={2} py={4}>
+                        <Typography
+                            textAlign="center"
+                            variant="h5" fontWeight="bolder" gutterBottom>
+                            {typeof user === 'object' ? '管理员权限确认失败' : '用户未登录'}
+                        </Typography>
+                        <Typography textAlign="center">
+                            你可以<Link component={ReactRouterLink} to="/"
+                                underline="hover"
+                            >点击这里来返回首页</Link>。
+                        </Typography>
+                    </Box>
+                </Paper>
+            </Box>
+        </Container>
+    </> : <>
         <NavBar showSearchBar />
         <Container maxWidth="lg">
             <Box py={2}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={7} md={8} lg={9}>
                         {mode === 'passed' ? (
-                            <PassedCommentList selectCallback={onCommentSelected} />
+                            <AdminInspectCommentList mode='verified' selectCallback={onCommentSelected} />
                         ) : (
-                            <ToBeVerifiedCommentList selectCallback={onCommentSelected} />
+                            <AdminInspectCommentList mode='toBeVerified' selectCallback={onCommentSelected} />
 
                         )}
                     </Grid>
