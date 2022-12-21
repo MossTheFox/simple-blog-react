@@ -82,7 +82,7 @@ function BlogPostComment({
 
         {loading && <TemplateLoadingPlaceHolder />}
         {!loading && err && <TemplateOnErrorRender
-            title={err.message} retryFunc={handleFetchComment} />}
+            message={err.message} retryFunc={handleFetchComment} />}
 
         {!loading && !err && (
             <Fade in>

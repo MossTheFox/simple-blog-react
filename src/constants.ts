@@ -1,3 +1,5 @@
-export const PLACEHOLDER_AVATAR_URL = '/vite.svg';
+export const PLACEHOLDER_AVATAR_URL = '/vite.svg' as const;
 
-export const AUTOSAVE_DB_KEYVAL = 'editor-autosave';
+export const ADMIN_FLAG = 'ADMIN' as const;
+
+export const AUTOSAVE_DB_KEYVAL = 'editor-autosave' as const;

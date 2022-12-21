@@ -2,6 +2,7 @@ import { ArrowBack, Edit } from "@mui/icons-material";
 import { Box, Button, Divider, Fade, Link, Typography } from "@mui/material";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useParams, useNavigate, Link as ReactRouterLink } from 'react-router-dom';
+import { ADMIN_FLAG } from "../../constants";
 import { blogUserContext } from "../../context/userContext";
 import AsyncLoadingHandler from "../../hooks/AsyncLoadingHandler";
 import { APIService } from "../../scripts/dataAPIInterface";
@@ -41,7 +42,7 @@ function BlogPost() {
         useEffect(() => {
             setAllowComment(data.allowComment);
             if (typeof user === 'object') {
-                setShowEditButton((user.username === data.author || user.flags.includes('ADMIN')));
+                setShowEditButton((user.username === data.author || user.flags.includes(ADMIN_FLAG)));
                 return;
             }
             setShowEditButton(false);

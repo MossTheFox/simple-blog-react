@@ -1,5 +1,6 @@
 import { Alert, Box, Button, Link, Paper, Snackbar, TextField, Typography } from "@mui/material"
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { ADMIN_FLAG } from "../../constants";
 import { blogUserContext } from "../../context/userContext";
 import { TemplateOnErrorRender } from "../../hooks/AsyncLoadingHandler";
 import useAsync from "../../hooks/useAsync";
@@ -50,7 +51,7 @@ function NewCommentForBlog({ id, onSubmitCallback }: {
     const [notificationOpen, setNotificationOpen] = useState(false);
     const msg = useMemo(() => {
         if (user === 'Not Login') return '?';
-        if (user.flags.includes('ADMIN')) {
+        if (user.flags.includes(ADMIN_FLAG)) {
             return '发布成功，请记得前往审核页面通过自己的评论。';
         }
         return '发布成功，评论将在审核完成后显示。'

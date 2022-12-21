@@ -2,7 +2,7 @@ import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Container, Divider, Fade, Grid, Link, Paper, Stack, TextField, Typography } from "@mui/material";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate, Link as ReactRouterLink, useParams } from "react-router-dom";
-import { PLACEHOLDER_AVATAR_URL } from "../constants";
+import { ADMIN_FLAG, PLACEHOLDER_AVATAR_URL } from "../constants";
 import { blogUserContext } from "../context/userContext";
 import { TemplateLoadingPlaceHolder, TemplateOnErrorRender } from "../hooks/AsyncLoadingHandler";
 import useAsync from "../hooks/useAsync";
@@ -98,7 +98,7 @@ function VisitorProfilePage() {
                                         <Typography variant="body2" gutterBottom>
                                             {currentUser.signature || '没有设置签名……'}
                                         </Typography>
-                                        {currentUser.flags.includes('ADMIN') && (
+                                        {currentUser.flags.includes(ADMIN_FLAG) && (
                                             <Typography variant="body2" gutterBottom>
                                                 管理员
                                             </Typography>

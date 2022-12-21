@@ -73,11 +73,17 @@ function BlogPostEditor({ mode, submitCallback, actionMenuCallback }: {
 
     const fireOnce = useAsync(asyncFunc, onSuccess, onError);
 
+    const handleFirstFetch = useCallback(() => {
+        setLoading(true);
+        setError(null);
+        fireOnce();
+    }, [fireOnce]);
+
     useEffect(() => {
         if (mode === 'edit') {
-            fireOnce();
+            handleFirstFetch();
         }
-    }, [mode, fireOnce]);
+    }, [mode, handleFirstFetch]);
 
     const [showCatInput, setShowCatInput] = useState(mode === 'new');
     const [catInput, setCatInput] = useState('');
@@ -141,7 +147,7 @@ function BlogPostEditor({ mode, submitCallback, actionMenuCallback }: {
         <Container maxWidth="xl">
             <Box py={2}>
                 {loading && <TemplateLoadingPlaceHolder />}
-                {(!loading && err) && <TemplateOnErrorRender />}
+                {(!loading && err) && <TemplateOnErrorRender message={err.message} retryFunc={handleFirstFetch} />}
                 {(!loading && !err) &&
                     <>
                         <Stack spacing={2} mb={2}>

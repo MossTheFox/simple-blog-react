@@ -29,7 +29,7 @@ function MainArticleList({ mode = 'all' }: {
     // Fix 
     useEffect(() => {
         if (page > totalPage) {
-            setPage(totalPage);
+            setPage(totalPage || 1);
         }
     }, [page, totalPage]);
 

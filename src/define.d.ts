@@ -36,14 +36,14 @@ type BlogSummaryData = {
 
 type CategoryRecord = {
     name: string;
-    postsCount: numnber;
+    postsCount: number;
 };
 
 type CategoryListData = CategoryRecord[];
 
 type TagRecord = {
     name: string;
-    postsCount: numnber;
+    postsCount: number;
 };
 
 type TagListData = TagRecord[];

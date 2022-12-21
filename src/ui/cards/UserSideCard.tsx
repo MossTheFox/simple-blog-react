@@ -2,7 +2,7 @@ import { AccountCircle, AdminPanelSettings, ArrowBack, BorderColor } from "@mui/
 import { Avatar, Box, Button, Collapse, Link, Stack, Typography } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
 import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
-import { PLACEHOLDER_AVATAR_URL } from "../../constants";
+import { ADMIN_FLAG, PLACEHOLDER_AVATAR_URL } from "../../constants";
 import { blogUserContext } from "../../context/userContext";
 import { APIService } from "../../scripts/dataAPIInterface";
 import UserLoginForm from "../forms/UserLoginForm";
@@ -58,14 +58,14 @@ function UserSideCard() {
         </>
             :
             // 已登录
-            <Stack spacing={2}>
+            <Stack spacing={1}>
                 <Button fullWidth startIcon={<BorderColor />} children="发布文章" variant="contained"
                     onClick={() => navigate('/editor/new')}
                 />
                 <Button fullWidth startIcon={<AccountCircle />} children="个人信息" variant="contained"
                     onClick={handleUserProfileBoxNavigate}
                 />
-                {user.flags.includes('ADMIN') &&
+                {user.flags.includes(ADMIN_FLAG) &&
                     <Button fullWidth startIcon={<AdminPanelSettings />} children="管理员页面" variant="outlined"
                         onClick={() => navigate('/admin')}
                     />

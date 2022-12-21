@@ -1,6 +1,7 @@
 import { Box, Button, Container, Divider, Grid, Link, Paper, Theme, Typography, useMediaQuery } from "@mui/material";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, Link as ReactRouterLink } from "react-router-dom";
+import { ADMIN_FLAG } from "../constants";
 import { blogUserContext } from "../context/userContext";
 import NavBar from "../ui/NavBar";
 import AdminInspectCommentList from "./admin/AdminInspectCommentList";
@@ -58,7 +59,7 @@ function AdminPage() {
         >返回主页</Button>
     </Grid>), [user, mode, toggle]);
 
-    return (user === 'Not Login' || !user.flags.includes('ADMIN')) ? <>
+    return (user === 'Not Login' || !user.flags.includes(ADMIN_FLAG)) ? <>
         <Container maxWidth="md">
             <Box py={10}>
                 <Paper>

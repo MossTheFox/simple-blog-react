@@ -1,0 +1,148 @@
+import { adminPassComment, blogCheckCurrentUser, blogGetCategoryList, blogGetTagList, blogLogin, blogSignOff, blogUserRegister, deleteBlog, deleteComment, getBlogDetail, getCommentForBlog, getPostsWithPage, getUnexaminedComment, getUserProfileViaUsername, getValidatedCommentList, parseFullUrl, postComment, postNewBlog, updateAvatar, updateBlog, updateProfile, uploadImage } from "./apiRaw";
+
+type BlogPostSearchQuery = {
+    author: string;
+    tag: string;
+    category: string;
+    searchText: string;
+    perPage: number;
+    thisPage: number;
+};
+
+
+// 这里是程序直接调用的接口部分。在这里完成请求的包装变换和适配。
+export class APIService {
+    static requestCache: ({ [key: string]: string })[];
+
+    /** 获取分类列表 */
+    static async getBlogCategoryList(): Promise<CategoryListData> {
+        return await blogGetCategoryList();
+    }
+
+    /** 获取标签列表 */
+    static async getBlogTagList(): Promise<TagListData> {
+        return await blogGetTagList();
+    }
+
+    /** 按查询条件查询卡片列表 */
+    static async getBlogSummaryList(query: Partial<BlogPostSearchQuery> & Required<{ perPage: number; thisPage: number; }>): Promise<{ data: BlogSummaryData[]; total: number; }> {
+        let additionalSearchQuery = '';
+        if (query.author) {
+            additionalSearchQuery += `&author=${encodeURI(query.author)}`;
+        }
+        if (query.category) {
+            additionalSearchQuery += `&category=${encodeURI(query.category)}`;
+        }
+        if (query.tag) {
+            additionalSearchQuery += `&tag=${encodeURI(query.tag)}`;
+        }
+        if (query.searchText) {
+            additionalSearchQuery += `&search=${encodeURI(query.searchText)}`
+        }
+        return await getPostsWithPage(query.thisPage, query.perPage, additionalSearchQuery);
+    };
+
+    /** 拉取完整文章信息 */
+    static async getBlogFullDataById(id: number | string): Promise<BlogPostData> {
+        return await getBlogDetail(+id);
+    };
+
+    /** 注册 */
+    static async register(username: string, password: string, code: string): Promise<void> {
+        await blogUserRegister(username, password, code);
+    };
+
+    /** 用户名密码登录、并获取当前已登录的用户信息 */
+    static async loginViaUsernameAndPassword(username: string, password: string): Promise<BlogUserCore & BlogUserData> {
+        await blogLogin(username, password);
+        let res = await this.checkCurrentUser();
+        if (!res) {
+            throw new Error('凭据没有成功保存。这不是你的问题，请别担心。');
+        }
+        return res;
+    };
+
+    /** 获取当前已登录的用户的状态，未登录返回空 */
+    static async checkCurrentUser(): Promise<null | (BlogUserCore & BlogUserData)> {
+        let firstRequest = await blogCheckCurrentUser();
+        if (!firstRequest) return null;
+        return firstRequest;
+    }
+
+    /** 拉取指定用户名的用户个人信息 */
+    static async getUserProfile(username: string): Promise<BlogUserCore & BlogUserData> {
+        return await getUserProfileViaUsername(username);
+    }
+
+    /** 注销 */
+    static async signoff(): Promise<void> {
+        await blogSignOff();
+        return;
+    };
+
+    /** 发布博客, 返回新的文章 ID */
+    static async postArticle(data: BlogPostEditorData): Promise<number> {
+        return (await postNewBlog(data)).id;
+    }
+
+    /** 修改博客, 需要提供目标的 ID */
+    static async updateArticle(data: BlogPostEditorData & { id: number; }): Promise<number> {
+        return await updateBlog(data);
+    }
+
+    /** 按 ID 删除。只有管理员或发布者可以操作对应的文章 */
+    static async deleteArticle(id: number): Promise<void> {
+        return await deleteBlog(id);
+    }
+
+    /** 图片文件上传 */
+    static async uploadImageFile(fileObject: File): Promise<string> {
+        return await uploadImage(fileObject);
+    }
+
+    /** 拼接资源 URL */
+    static parseResourceUrl(path: string) {
+        if (path.startsWith('http')) return path;
+        return parseFullUrl(path);
+    }
+
+    /** 拉取评论 */
+    static async getCommentsForBlog(blogId: number, page: number, perPage: number): Promise<{ data: BlogComment[], total: number }> {
+        return await getCommentForBlog(blogId, page, perPage);
+    }
+
+    /** 拉取待审核的评论 */
+    static async getToBeVerifiedComments(page: number, perPage: number): Promise<{ data: BlogComment[], total: number }> {
+        return await getUnexaminedComment(page, perPage);
+    }
+
+    /** 拉取已审核评论 */
+    static async getVerifiedComments(page: number, perPage: number): Promise<{ data: BlogComment[], total: number }> {
+        return await getValidatedCommentList(page, perPage);
+    }
+
+    /** 发布评论 */
+    static async postComment(content: string, toBlogId: number, replyToCommentId?: number): Promise<void> {
+        return await postComment(content, toBlogId, replyToCommentId);
+    }
+
+    /** 通过审核评论 */
+    static async adminValidateComment(commentId: number, undo = false): Promise<void> {
+        return await adminPassComment(commentId, undo);
+    }
+
+    /** 删除评论 */
+    static async deleteComment(commentId: number): Promise<void> {
+        return await deleteComment(commentId);
+    }
+
+    /** 修改个人资料 */
+    static async updateProfile(profile: Partial<BlogUserData & { password: string }>): Promise<Partial<BlogUserData>> {
+        return await updateProfile(profile);
+    }
+
+    /** 头像上传 */
+    static async updateAvatar(fileObject: File): Promise<string> {
+        return await updateAvatar(fileObject);
+    }
+};

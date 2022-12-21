@@ -2,7 +2,7 @@ import { Delete, Reply } from "@mui/icons-material";
 import { Alert, Avatar, Box, Button, ButtonBase, Card, CardActions, CardContent, CardHeader, Collapse, Link, Menu, MenuItem, Paper, Snackbar, Typography } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
-import { PLACEHOLDER_AVATAR_URL } from "../../constants";
+import { ADMIN_FLAG, PLACEHOLDER_AVATAR_URL } from "../../constants";
 import { blogUserContext } from "../../context/userContext";
 import useAsync from "../../hooks/useAsync";
 import { APIService } from "../../scripts/dataAPIInterface";
@@ -72,7 +72,7 @@ function SingleCommentCard({ comment, replyToTarget, replyTargetDeleted, actionE
         setOpenReplyField(false);
         const message = (() => {
             if (user === 'Not Login') return '?';
-            if (user.flags.includes('ADMIN')) {
+            if (user.flags.includes(ADMIN_FLAG)) {
                 return '发布成功，请记得前往审核页面通过自己的评论。';
             }
             return '发布成功，评论将在审核完成后显示。'
@@ -152,7 +152,7 @@ function SingleCommentCard({ comment, replyToTarget, replyTargetDeleted, actionE
         }}>
             <Box>
                 {typeof user === 'object' && (
-                    user.username === comment.user.username || user.flags.includes('ADMIN')
+                    user.username === comment.user.username || user.flags.includes(ADMIN_FLAG)
                 ) && (
                         <Button variant="text" startIcon={<Delete />}
                             color="error"

@@ -2,6 +2,7 @@ import { Edit } from "@mui/icons-material";
 import { Box, Button, ButtonBase, Link, Paper, Typography } from "@mui/material";
 import { useContext } from "react";
 import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
+import { ADMIN_FLAG } from "../../constants";
 import { blogUserContext } from "../../context/userContext";
 
 function BlogSummaryCardMain({ blogSummaryData }: {
@@ -58,7 +59,7 @@ function BlogSummaryCardMain({ blogSummaryData }: {
                 {blogSummaryData.summary}
             </Typography>
             {/* NOTE: 这里暂时用了用户名比对来比较作者。 */}
-            {(typeof user === 'object' && (user.username === blogSummaryData.author || user.flags.includes('ADMIN'))) && (
+            {(typeof user === 'object' && (user.username === blogSummaryData.author || user.flags.includes(ADMIN_FLAG))) && (
                 <Box display='flex' justifyContent='end' flexWrap='wrap' >
                     <Button size="small"
                         startIcon={<Edit />}

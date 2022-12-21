@@ -2,6 +2,7 @@ import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Container, Divider, Grid, Link, Paper, Stack, TextField, Typography } from "@mui/material";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate, Link as ReactRouterLink } from "react-router-dom";
+import { ADMIN_FLAG } from "../constants";
 import { blogUserContext } from "../context/userContext";
 import { TemplateOnErrorRender } from "../hooks/AsyncLoadingHandler";
 import useAsync from "../hooks/useAsync";
@@ -96,7 +97,7 @@ function ProfilePage() {
                                     <Typography variant="body2" gutterBottom>
                                         {user.signature || '没有设置签名……'}
                                     </Typography>
-                                    {user.flags.includes('ADMIN') && (
+                                    {user.flags.includes(ADMIN_FLAG) && (
                                         <Typography variant="body2" gutterBottom>
                                             管理员
                                         </Typography>
@@ -104,7 +105,7 @@ function ProfilePage() {
                                     <Button fullWidth variant="contained" color="primary" sx={{ mb: 2 }}
                                         onClick={openProfileEdit}>编辑个人资料</Button>
 
-                                    {user.flags.includes('ADMIN') &&
+                                    {user.flags.includes(ADMIN_FLAG) &&
                                         <Button fullWidth children="管理面板" variant="outlined"
                                             onClick={() => navigate('/admin')}
                                         />
