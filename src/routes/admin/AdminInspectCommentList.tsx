@@ -54,6 +54,7 @@ function AdminInspectCommentList({
 
     useEffect(() => {
         setWorkMode(mode);
+        setCommentPage(1);
         handleFetchComment();
     }, [handleFetchComment, mode]);
 
