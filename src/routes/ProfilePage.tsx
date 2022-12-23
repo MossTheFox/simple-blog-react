@@ -8,6 +8,7 @@ import { TemplateOnErrorRender } from "../hooks/AsyncLoadingHandler";
 import useAsync from "../hooks/useAsync";
 import { APIService } from "../scripts/dataAPIInterface";
 import BigAvatar from "../ui/forms/BigAvatar";
+import ChangePasswordDialog from "../ui/forms/ChangePasswordDialog";
 import NavBar from "../ui/NavBar";
 import DialogLoadingIndicator from "../ui/smallComponents/DialogLoadingIndicator";
 import MyArticlesSubPage from "./articleList/MyArticlesSubPage";
@@ -58,6 +59,12 @@ function ProfilePage() {
         scrollTo(0, 0);
     }, []);
 
+    // password dialog
+    const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+    const openChangePasswordDialog = useCallback(() => {
+        setPasswordDialogOpen(true);
+    }, []);
+
     return <>
         {user === 'Not Login' ? <>
             <Container maxWidth="md">
@@ -105,6 +112,7 @@ function ProfilePage() {
                                     <Button fullWidth variant="contained" color="primary" sx={{ mb: 2 }}
                                         onClick={openProfileEdit}>编辑个人资料</Button>
 
+
                                     {user.flags.includes(ADMIN_FLAG) &&
                                         <Button fullWidth children="管理面板" variant="outlined"
                                             onClick={() => navigate('/admin')}
@@ -112,7 +120,7 @@ function ProfilePage() {
                                     }
                                 </>}
                                 {profieEdit && <>
-                                    <Stack spacing={2}>
+                                    <Stack spacing={2} mb={4}>
                                         <Box>
                                             <Button variant="outlined"
                                                 onClick={() => setProfileEdit(false)}
@@ -139,6 +147,11 @@ function ProfilePage() {
                                             onClick={handleSubmit}
                                         />
                                     </Stack>
+                                    <Box textAlign='end'>
+                                        <Button variant="outlined" size="small" color="secondary" sx={{ mb: 2 }}
+                                            onClick={openChangePasswordDialog}>修改登录密码</Button>
+                                    </Box>
+                                    <ChangePasswordDialog open={passwordDialogOpen} setOpen={setPasswordDialogOpen} />
                                 </>
                                 }
                             </Box>

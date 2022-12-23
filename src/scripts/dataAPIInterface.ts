@@ -62,6 +62,12 @@ export class APIService {
         return res;
     };
 
+    /** 修改密码 */
+    static async changePassword(newPassword: string): Promise<void> {
+        await updateProfile({ password: newPassword });
+    };
+
+
     /** 获取当前已登录的用户的状态，未登录返回空 */
     static async checkCurrentUser(): Promise<null | (BlogUserCore & BlogUserData)> {
         let firstRequest = await blogCheckCurrentUser();

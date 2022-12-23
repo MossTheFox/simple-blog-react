@@ -30,15 +30,7 @@ export function markdownGetReactDOMs(md: string | marked.Token[]): (JSX.Element 
                 return <br key={i} />;
             case 'code':
                 // 代码块
-                switch (v.codeBlockStyle) {
-                    case 'indented':
-                        return <pre key={i}>
-                            <code>{children}</code>
-                        </pre>;
-                    default:
-                        // 触发条件未知 (得看 marked 源码)
-                        return <code key={i}>{children}</code>;
-                }
+                return <pre><code key={i}>{children || v.text}</code></pre>;
             case 'codespan':
                 return <code key={i}>{children}</code>;
             case 'del':
@@ -57,16 +49,28 @@ export function markdownGetReactDOMs(md: string | marked.Token[]): (JSX.Element 
                 // 大标题
                 const level = v.depth;  // 1 ~ 6
                 const depthVariant = ['body1', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as const;
+                const fontSize = ['unset', '2rem', '1.5rem', '1.25rem', '1rem', '0.875rem', '0.85rem'] as const;
                 return <Typography key={i}
                     variant={depthVariant[level]}
                     fontWeight="bolder"
-                    gutterBottom>{children}</Typography>;
+                    {...depthVariant[level] !== 'body1' ? { fontSize: `${fontSize[level]} !important` } : {}}
+                    {...depthVariant[level] === 'h6' ? { fontColor: 'textSecondary' } : {}}
+                    {...(depthVariant[level] === 'h1' || depthVariant[level] === 'h2') ? {
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                        pb: '.3em'
+                    } : {}}
+                    gutterBottom
+                >{children}</Typography>;
             case 'hr':
                 return <Divider key={i} />;
             case 'html':
                 // 拒绝 parse... 除了个别特例
                 switch (v.raw.trim()) {
                     case '<br>':
+                    case '<br >':
+                    case '<br />':
+                    case '<br/>':
                         return <br key={i} />;
                     default:
                         return <span key={i}>{v.raw}</span>;

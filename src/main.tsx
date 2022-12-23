@@ -1,3 +1,4 @@
+import './App.css';
 import { Box, CssBaseline } from "@mui/material";
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -13,6 +14,7 @@ import ProfilePage from "./routes/ProfilePage";
 import VisitorProfilePage from "./routes/VisitorProfilePage";
 import MainContainer from "./ui/MainContainer";
 import WrappedThemeProvider from "./ui/WrappedThemeProvider";
+
 
 const router = createBrowserRouter([
     {

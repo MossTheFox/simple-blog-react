@@ -49,7 +49,7 @@ function BlogPost() {
         }, [data, user, setShowEditButton, setAllowComment])
 
         return <Fade in={true}>
-            <Box pb={2}>
+            <Box component="article" pb={2}>
                 <Typography variant="h4" fontWeight='bolder' gutterBottom
                     borderBottom={1} borderColor="divider" textAlign='center'
                 >{data.title}</Typography>
