@@ -1,9 +1,11 @@
 import { Box, Button, Checkbox, Grid, Link, TextField, Typography } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MarkdownLocalCacheHandler } from "../../scripts/localDB";
+import ClipboardImageHandler from "../../ui/forms/ClipboardImageHandler";
 import ImageUploadButton from "../../ui/forms/ImageUploadButton";
 import { markdownGetReactDOMs } from "../../utils/markdownTools";
 import MarkdownAutosaveDrawer from "./MarkdownAutosaveDrawer";
+import MarkdownEditorHelpDialog from "./MarkdownEditorHelpDialog";
 
 function MarkdownEditor({ initialValue, updateCallback }: {
     updateCallback?: (md: string) => void;
@@ -118,22 +120,47 @@ function MarkdownEditor({ initialValue, updateCallback }: {
         };
     }, [inputRef])
 
+    // 帮助对话框
+    const [helpDialogOpen, setHelpDialogOpen] = useState(false);
+    const openHelp = useCallback(() => setHelpDialogOpen(true), []);
+
+    // 粘贴图片
+
+    const [clipboardImage, setClipboardImage] = useState<File | null>(null);
+    const handlePaste = useCallback((e: React.ClipboardEvent<HTMLDivElement>) => {
+        if (e.clipboardData.files.length) {
+            // handle...
+            e.preventDefault();
+            const file = e.clipboardData.files[0];
+            if (!file.type.includes('image/')) {
+                return;
+            }
+            // 准备图片上传
+            setClipboardImage(file);
+        }
+    }, []);
+
+
     return <Grid container spacing={2}>
         <Grid item xs={12} sm={enableRealtimePreview ? 6 : 12}>
             <Box display='flex' justifyContent='space-between'>
-                <Box>
+                <Box display='flex' justifyContent="start" gap={1} flexWrap='wrap' alignItems="baseline" mb={1}>
                     <Typography variant="body2" fontWeight="bolder" gutterBottom>
-                        Markdown <Link
+                        Markdown
+                        {/* <Link
                             target="_blank"
                             rel="noopener noreferrer"
                             href="https://www.markdownguide.org/cheat-sheet/"
                             underline="hover"
-                        >语法帮助</Link>
+                        >语法帮助</Link> */}
                     </Typography>
-                    <Typography variant="body2" color="textSecondary" gutterBottom>
-                        若要使用标题格式，建议从 三级标题 开始。
-                    </Typography>
+                    <Link component="button" fontWeight='bolder' display="inline-block"
+                        onClick={openHelp}
+                        variant="body2" color="primary" underline="hover" gutterBottom>
+                        支持的语法列表
+                    </Link>
                 </Box>
+                <MarkdownEditorHelpDialog open={helpDialogOpen} setOpen={setHelpDialogOpen} />
                 {!enableRealtimePreview &&
                     <Box pb={1}>
                         <Typography variant="body2" fontWeight="bolder" display="inline-block">实时预览
@@ -163,7 +190,9 @@ function MarkdownEditor({ initialValue, updateCallback }: {
         <Grid item xs={12} sm={enableRealtimePreview ? 6 : 12}>
             <Box height={'calc(100vh - 10rem)'} overflow="auto"
                 border={1} borderColor="divider" borderRadius={(theme) => `${theme.shape.borderRadius}px`}
+                position="relative"
             >
+                <ClipboardImageHandler urlCallback={urlCallback} file={clipboardImage} setFile={setClipboardImage} />
                 <TextField
                     size="small"
                     fullWidth
@@ -174,6 +203,7 @@ function MarkdownEditor({ initialValue, updateCallback }: {
                     inputRef={inputRef}
                     onChange={(e) => setMd(e.target.value)}
                     onKeyDown={tabInsertHandler}
+                    onPaste={handlePaste}
                 />
 
             </Box>

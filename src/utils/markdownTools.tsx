@@ -32,7 +32,7 @@ export function markdownGetReactDOMs(md: string | marked.Token[]): (JSX.Element 
                 // 代码块
                 return <pre><code key={i}>{children || v.text}</code></pre>;
             case 'codespan':
-                return <code key={i}>{children}</code>;
+                return <code key={i}>{children || v.text}</code>;
             case 'del':
                 return <del key={i}>{children}</del>;
             case 'def':
@@ -63,9 +63,10 @@ export function markdownGetReactDOMs(md: string | marked.Token[]): (JSX.Element 
                     gutterBottom
                 >{children}</Typography>;
             case 'hr':
-                return <Divider key={i} />;
+                return <Divider key={i} sx={{ my: 2 }} />;
             case 'html':
                 // 拒绝 parse... 除了个别特例
+                import.meta.env.DEV && console.log(v);
                 switch (v.raw.trim()) {
                     case '<br>':
                     case '<br >':
@@ -77,7 +78,7 @@ export function markdownGetReactDOMs(md: string | marked.Token[]): (JSX.Element 
                 }
             case 'image':
                 // TODO: 图片框组件...
-                return <img key={i} src={v.href} alt={v.text} style={{ maxWidth: '100%' }} />
+                return <img key={i} src={v.href} alt={v.text} style={{ maxWidth: '100%' }} role="img"/>
             case 'link':
                 // 自动生成的链接中，text 和 href 相等. 此时不进行下一步转换
                 // 邮箱...例外
@@ -102,7 +103,7 @@ export function markdownGetReactDOMs(md: string | marked.Token[]): (JSX.Element 
                 return <strong key={i}>{children}</strong>;
             case 'table':
                 // Markdown table 必须有表头。ref: https://stackoverflow.com/questions/17536216/create-a-table-without-a-header-in-markdown
-                return <TableContainer key={i} component={Paper}>
+                return <TableContainer key={i} component={Paper} sx={{ mb: 2 }}>
                     <Table>
                         <TableHead>
                             <TableRow>
