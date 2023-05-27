@@ -26,7 +26,7 @@ function MainPage() {
         </Fade>
     }, []);
 
-    const tafComponentsRender = useCallback(({ data }: { data: TagListData }) => {
+    const tabComponentsRender = useCallback(({ data }: { data: TagListData }) => {
         return <Fade in>
             <Box>
                 <BlogChipNavigate tagList={data} />
@@ -78,7 +78,7 @@ function MainPage() {
                         </Box>
 
                         <AsyncLoadingHandler asyncFunc={APIService.getBlogTagList}
-                            OnSuccessRender={tafComponentsRender} />
+                            OnSuccessRender={tabComponentsRender} />
 
                     </Grid>
                 </Grid>

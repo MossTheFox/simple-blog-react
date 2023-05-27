@@ -30,7 +30,7 @@ export function markdownGetReactDOMs(md: string | marked.Token[]): (JSX.Element 
                 return <br key={i} />;
             case 'code':
                 // 代码块
-                return <pre><code key={i}>{children || v.text}</code></pre>;
+                return <pre key={i}><code>{children || v.text}</code></pre>;
             case 'codespan':
                 return <code key={i}>{children || v.text}</code>;
             case 'del':

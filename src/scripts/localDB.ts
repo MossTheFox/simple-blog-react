@@ -6,6 +6,8 @@ export type MarkdownAutosaveDocument = {
     data: string;
 };
 
+const AUTOSAVE_LIMIT = 50;
+
 /** TODO: 用数据库应有的样子来做增删查 */
 export class MarkdownLocalCacheHandler {
 
@@ -38,14 +40,23 @@ export class MarkdownLocalCacheHandler {
         data = data.trim();
         if (data.length === 0) return;
         let curr = await this.getMarkdownAutosavedRecords();
-        if (curr.length > 19) {
-            curr = curr.slice(0, 19);
+        if (curr.length > AUTOSAVE_LIMIT) {
+            curr = curr.slice(0, AUTOSAVE_LIMIT);
         }
+        // 重复
         if (curr.find((v) => v.data === data)) return;
-        curr.unshift({
-            data: data.trim(),
-            unixTime: time.getTime()
-        });
+        // 前缀包含
+        let prefixInclude = curr.findIndex((v) => v.data.startsWith(data) && data.length - v.data.length < 25);
+        if (prefixInclude === -1) {
+            curr.unshift({
+                data: data.trim(),
+                unixTime: time.getTime()
+            });
+        } else {
+            curr[prefixInclude].data = data;
+            curr[prefixInclude].unixTime = Date.now();
+            curr.sort((a, b) => b.unixTime - a.unixTime);
+        }
         await set(AUTOSAVE_DB_KEYVAL, JSON.stringify(curr));
     }
 }

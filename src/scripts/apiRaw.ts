@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.DEV ? `/api` : '/';
+// const API_URL = import.meta.env.DEV ? `/api` : '/';
+const API_URL = '/api';
 
 const abortController = {
     get signal() {

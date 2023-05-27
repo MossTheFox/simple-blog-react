@@ -1,0 +1,866 @@
+// const API_URL = import.meta.env.DEV ? `/api` :
+//     `https://blog-alpha-api-forward.dev.mxowl.com` as const;
+
+const API_URL = `/api`;
+
+const abortController = {
+    get signal() {
+        let controller = new AbortController();
+        setTimeout(() => {
+            controller.abort();
+        }, 16 * 1000);
+        return controller.signal;
+    }
+};
+
+/** Not implemented */
+export async function getServerStatus(signal = abortController.signal) {
+    let res = await fetch(`${API_URL}/status`, {
+        signal
+    });
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+    return 'ok';
+}
+
+export async function blogUserRegister(username: string, password: string, code: string, signal = abortController.signal) {
+    let res = await fetch(`${API_URL}/user/register?code=${code}`, {
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json; charset=utf-8'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ username, password, code }),
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    return null;
+}
+
+export async function blogLogin(username: string, password: string, signal = abortController.signal) {
+    let res = await fetch(`${API_URL}/user/login`, {
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json; charset=utf-8'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ username, password }),
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    return null;
+}
+
+export async function blogChangePassword(password: string, signal = abortController.signal) {
+    let res = await fetch(`${API_URL}/user`, {
+        method: 'PUT',
+        headers: {
+            'content-type': 'application/json; charset=utf-8'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ password }),
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    return null;
+}
+
+export async function blogGetUserProfile(id: number, signal = abortController.signal): Promise<BlogUserData> {
+    let res = await fetch(`${API_URL}/profile/${id}`, {
+        credentials: 'include',
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (!('code' in json) || json.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    if (!json.data) throw new Error('用户不存在');
+
+    const templateUserObject: BlogUserData = {
+        // id: (+json.data?.id) || -1,
+        avatar: (json.data?.avatar) || '/vite.svg',
+        // flags: [json.data?.role],
+        signature: json.data?.signature || '',
+        username: json.data.username || '用户'
+    };
+
+    return templateUserObject;
+}
+
+export async function blogCheckCurrentUser(signal = abortController.signal): Promise<null | (BlogUserCore & BlogUserData)> {
+    let res = await fetch(`${API_URL}/user/data`, {
+        credentials: 'include',
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (!('code' in json)) {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    if (json.code !== 'ok') {
+        // 未登录
+        return null;
+    }
+
+    const templateUserObject: BlogUserCore & BlogUserData = {
+        id: (+json.data?.id) || -1,
+        avatar: (json.data?.avatar) || '/vite.svg',
+        flags: [json.data?.role],
+        signature: json.data?.signature || '',
+        username: json.data.username || '用户'
+    };
+
+    return templateUserObject;
+}
+
+export async function getUserProfileViaUsername(username: string, signal = abortController.signal): Promise<BlogUserCore & BlogUserData> {
+    let res = await fetch(`${API_URL}/profile/?username=${encodeURI(username)}`, {
+        credentials: 'include',
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (!('code' in json) || json.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    if (!json.data) throw new Error('不存在的用户');
+
+    const templateUserObject: BlogUserData & BlogUserCore = {
+        id: json.data.id ?? -1,
+        flags: [json.data?.role],
+        avatar: (json.data?.avatar) || '/vite.svg',
+        signature: json.data?.signature || '',
+        username: json.data.username || '无名用户'
+    };
+    return templateUserObject;
+}
+
+export async function blogSignOff(signal = abortController.signal) {
+    let res = await fetch(`${API_URL}/user/logout`, {
+        method: 'POST',
+        credentials: 'include',
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    return null;
+}
+
+export async function blogGetCategoryList(signal = abortController.signal): Promise<CategoryListData> {
+    let res = await fetch(`${API_URL}/category/all`, {
+        credentials: 'include',
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    if (!Array.isArray(json?.data)) {
+        throw new Error('服务端响应异常');
+    }
+
+    let rawData = json.data as CategoryListData;
+
+    let data: CategoryListData = [];
+
+    for (const i of rawData) {
+        data.push({
+            name: i.name + '',
+            postsCount: +i.postsCount
+        });
+    }
+
+    return data;
+}
+
+export async function blogGetTagList(signal = abortController.signal): Promise<TagListData> {
+    let res = await fetch(`${API_URL}/tag/all`, {
+        credentials: 'include',
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    if (!Array.isArray(json?.data)) {
+        throw new Error('服务端响应异常');
+    }
+
+    let rawData = json.data as TagListData;
+
+    let data: TagListData = [];
+
+    for (const i of rawData) {
+        data.push({
+            name: i.name + '',
+            postsCount: +i.postsCount
+        });
+    }
+
+    return data;
+}
+
+const sampleResponseForPageSearchA = {
+    "records": [
+        {
+            "id": 1,
+            "author": "test",
+            "summary": null,
+            "title": "标题",
+            "content": null,
+            "category": "About",
+            "tag": "a,b",
+            "allowComment": 0,
+            "isDeleted": 1,
+            "createTime": "2017-03-12 00:31:15",
+            "updateTime": "2018-11-12 00:31:15"
+        }
+    ],
+    "total": 7,
+    "size": 10,
+    "current": 1,
+    "orders": [],
+    "optimizeCountSql": true,
+    "searchCount": true,
+    "countId": null,
+    "maxLimit": null,
+    "pages": 1
+};
+
+export async function getPostsWithPage(page: number, perpage: number, additionalSearchQuery?: string, signal = abortController.signal):
+    Promise<{ data: BlogSummaryData[], total: number }> {
+    let res = await fetch(`${API_URL}/blog/search_card?pageNum=${page}&pageSize=${perpage}${additionalSearchQuery ? additionalSearchQuery : ''
+        }`, {
+        credentials: 'include',
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    let rawData = json.data as typeof sampleResponseForPageSearchA;
+
+
+    let data: BlogSummaryData[] = [];
+
+    for (const i of rawData.records) {
+        data.push({
+            id: i.id ?? -1,
+            author: i.author + '',
+            authorId: -1,
+            category: i.category + '',
+            tags: (i.tag || '').split(',').filter((v) => v),
+            createdAt: new Date((i.createTime || Date.now())),
+            summary: i.summary || '',
+            title: i.title || '无标题'
+        });
+    }
+
+    return {
+        data,
+        total: +rawData.total
+    };
+}
+
+const blogRecordSampleData = {
+    "id": 3,
+    "author": "test",
+    "summary": null,
+    "title": "AAA",
+    "content": "AAA",
+    "category": "AAA",
+    "tag": "AAA",
+    "allowComment": 0,
+    "isDeleted": 1,
+    "createTime": "2019-04-24 15:46:15",
+    "updateTime": "2019-04-24 15:46:15"
+};
+
+
+
+export async function getBlogDetail(id: number, signal = abortController.signal): Promise<BlogPostData> {
+    let res = await fetch(`${API_URL}/blog/${id}`, {
+        credentials: 'include',
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    let rawData = json.data as (typeof blogRecordSampleData) | null;
+
+
+    if (!rawData) {
+        throw new Error('此编号的文章不存在。');
+    }
+
+    return {
+        id: rawData.id,
+        author: rawData.author || '',
+        authorId: -1,
+        summary: rawData.summary || '',
+        category: rawData.category || '',
+        allowComment: !!rawData.allowComment,
+        content: rawData.content || '',
+        createdAt: new Date((rawData.createTime || Date.now())),
+        lastModified: new Date((rawData.updateTime || rawData.createTime || Date.now())),
+        tags: (rawData.tag || '').split(',').filter((v) => v),
+        title: rawData.title || '无标题'
+    };
+}
+
+export async function postNewBlog(article: BlogPostEditorData, signal = abortController.signal) {
+    const body = {
+        title: article.title,
+        summary: article.summary,
+        content: article.content,
+        category: article.category,
+        tag: article.tags.join(','),
+        allowComment: article.allowComment ? 1 : 0,
+    };
+
+    let res = await fetch(`${API_URL}/blog`, {
+        credentials: 'include',
+        signal,
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    return +json.data;
+}
+
+export async function updateBlog(article: BlogPostEditorData & { id: number }, signal = abortController.signal) {
+    const body = {
+        id: article.id,
+        title: article.title,
+        summary: article.summary,
+        content: article.content,
+        category: article.category,
+        tag: article.tags.join(','),
+        allowComment: article.allowComment ? 1 : 0,
+    };
+
+    let res = await fetch(`${API_URL}/blog`, {
+        credentials: 'include',
+        signal,
+        method: 'PUT',
+        headers: {
+            'content-type': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    // return +json.data;
+    return article.id;
+}
+
+export async function deleteBlog(id: number, signal = abortController.signal) {
+    let res = await fetch(`${API_URL}/blog/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        signal,
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    return;
+}
+
+export async function uploadImage(file: File, signal = abortController.signal) {
+    let form = new FormData();
+    form.append('file', file, file.name);
+    let res = await fetch(`${API_URL}/file/upload`, {
+        method: 'POST',
+        credentials: 'include',
+        body: form,
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    return json.data + '';
+}
+
+export function parseFullUrl(path: string) {
+    let full = `${API_URL}/${path}`;
+    return full;
+}
+
+const commentDataSample = {
+    "records": [
+        {
+            "id": 89,
+            "blogId": 53,
+            "replyTo": 88,
+            "commenter": "田所浩二",
+            "content": "呐 🎵",
+            "time": "2022-12-20T06:19:38.091Z",
+            "status": 1,
+            "isDeleted": 0,
+            "profile": {
+                "id": 1,
+                "username": "田所浩二",
+                "avatar": "/file/a21e94c9679d4d1c94878b71ca8fe366",
+                "role": "ADMIN",
+                "signature": "( •̀ ω •́ )y"
+            },
+            "replyTarget": {
+                "id": 88,
+                "blogId": 53,
+                "replyTo": null,
+                "commenter": "嘉然今天吃答辩",
+                "content": "可爱捏\n",
+                "time": "2022-12-20T05:57:27.551Z",
+                "status": 1,
+                "isDeleted": 0,
+                "profile": null,
+                "replyTarget": null
+            }
+        }
+    ],
+    "total": 13,
+    "size": 10,
+    "current": 1,
+    "orders": [],
+    "optimizeCountSql": true,
+    "searchCount": true,
+    "countId": null,
+    "maxLimit": null,
+    "pages": 2
+};
+
+
+export async function getCommentForBlog(blogId: number | string, page: number, perPage: number, signal = abortController.signal)
+    : Promise<{
+        data: BlogComment[],
+        total: number
+    }> {
+    let res = await fetch(`${API_URL}/comment/search_examined?blogId=${blogId}&pageNum=${page}&pageSize=${perPage}`, {
+        method: 'GET',
+        credentials: 'include',
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    let rawData = json.data as typeof commentDataSample;
+
+    let data: BlogComment[] = [];
+
+    for (const raw of rawData.records) {
+        if (!raw.profile) {
+            throw new Error('服务端返回的评论中存在无效字段 (profile: null)');
+        }
+        data.push({
+            id: raw.id,
+            blogId: raw.blogId,
+            content: raw.content,
+            replyTo: raw.replyTo,
+            time: new Date(raw.time),
+            user: {
+                avatar: raw.profile.avatar || '/vite.svg',
+                signature: raw.profile.signature || '',
+                username: raw.profile.username || '未知用户'
+            },
+            replyTarget: raw.replyTarget ? ({
+                id: raw.replyTarget.id,
+                blogId: raw.replyTarget.blogId,
+                content: raw.replyTarget.content,
+                replyTo: raw.replyTarget.replyTo,
+                time: new Date(raw.replyTarget.time),
+                user: {
+                    avatar: '/vite.svg',
+                    signature: '',
+                    username: raw.replyTarget.commenter || '未知用户'
+                },
+            }) : undefined
+        });
+    }
+    return {
+        data,
+        total: rawData.total
+    }
+}
+
+export async function getUnexaminedComment(page: number, perPage: number, signal = abortController.signal)
+    : Promise<{
+        data: BlogComment[],
+        total: number
+    }> {
+    let res = await fetch(`${API_URL}/comment/search_unexamined?pageNum=${page}&pageSize=${perPage}`, {
+        method: 'GET',
+        credentials: 'include',
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    let rawData = json.data as typeof commentDataSample;
+
+    let data: BlogComment[] = [];
+
+    for (const raw of rawData.records) {
+        if (!raw.profile) {
+            throw new Error('服务端返回的评论中存在无效字段 (profile: null)');
+        }
+        data.push({
+            id: raw.id,
+            blogId: raw.blogId,
+            content: raw.content,
+            replyTo: raw.replyTo,
+            time: new Date(raw.time),
+            user: {
+                avatar: raw.profile.avatar || '/vite.svg',
+                signature: raw.profile.signature || '',
+                username: raw.profile.username || '未知用户'
+            },
+            replyTarget: raw.replyTarget ? ({
+                id: raw.replyTarget.id,
+                blogId: raw.replyTarget.blogId,
+                content: raw.replyTarget.content,
+                replyTo: raw.replyTarget.replyTo,
+                time: new Date(raw.replyTarget.time),
+                user: {
+                    avatar: '/vite.svg',
+                    signature: '',
+                    username: raw.replyTarget.commenter || '未知用户'
+                },
+            }) : undefined
+        })
+    }
+    return {
+        data,
+        total: rawData.total
+    }
+}
+
+export async function getExaminedComment(page: number, perPage: number, signal = abortController.signal)
+    : Promise<{
+        data: BlogComment[],
+        total: number
+    }> {
+    let res = await fetch(`${API_URL}/comment/search_examined?pageNum=${page}&pageSize=${perPage}`, {
+        method: 'GET',
+        credentials: 'include',
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    let rawData = json.data as typeof commentDataSample;
+
+    let data: BlogComment[] = [];
+
+    for (const raw of rawData.records) {
+        if (!raw.profile) {
+            throw new Error('服务端返回的评论中存在无效字段 (profile: null)');
+        }
+        data.push({
+            id: raw.id,
+            blogId: raw.blogId,
+            content: raw.content,
+            replyTo: raw.replyTo,
+            time: new Date(raw.time),
+            user: {
+                avatar: raw.profile.avatar || '/vite.svg',
+                signature: raw.profile.signature || '',
+                username: raw.profile.username || '未知用户'
+            },
+            replyTarget: raw.replyTarget ? ({
+                id: raw.replyTarget.id,
+                blogId: raw.replyTarget.blogId,
+                content: raw.replyTarget.content,
+                replyTo: raw.replyTarget.replyTo,
+                time: new Date(raw.replyTarget.time),
+                user: {
+                    avatar: '/vite.svg',
+                    signature: '',
+                    username: raw.replyTarget.commenter || '未知用户'
+
+                },
+            }) : undefined
+        });
+    }
+    return {
+        data,
+        total: rawData.total
+    }
+}
+
+export async function postComment(content: string, toBlog: number, replyTo?: number, signal = abortController.signal) {
+    const body = {
+        blogId: +toBlog,
+        replyTo: replyTo || null,
+        content,
+        // test
+        // status: 1
+    };
+
+    let res = await fetch(`${API_URL}/comment`, {
+        credentials: 'include',
+        signal,
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    return;
+}
+
+export async function updateSignature(sig: string, signal = abortController.signal) {
+    let res = await fetch(`${API_URL}/profile`, {
+        credentials: 'include',
+        signal,
+        method: 'PUT',
+        headers: {
+            'content-type': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify({
+            signature: sig
+        })
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    return;
+}
+
+export async function updateAvatar(file: File, signal = abortController.signal) {
+    let form = new FormData();
+    form.append('file', file, file.name);
+    let res = await fetch(`${API_URL}/profile/upload_avatar`, {
+        method: 'POST',
+        credentials: 'include',
+        body: form,
+        signal
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    return json.data + '';
+}
+
+export async function deleteComment(commentId: number, signal = abortController.signal) {
+    let res = await fetch(`${API_URL}/comment/${commentId}`, {
+        credentials: 'include',
+        signal,
+        method: 'DELETE',
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    return;
+}
+
+export async function adminPassComment(commentId: number, undo = false, signal = abortController.signal) {
+    let res = await fetch(`${API_URL}/comment/examine`, {
+        credentials: 'include',
+        signal,
+        method: 'PUT',
+        headers: {
+            'content-type': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify({
+            id: commentId,
+            undo: undo ? 1 : 0
+        })
+    });
+
+    if (!res.ok) {
+        throw new Error(res.statusText || res.status + '');
+    }
+
+    let json = await res.json();
+
+    if (json?.code !== 'ok') {
+        throw new Error(json?.msg || '服务端响应异常');
+    }
+
+    return;
+}

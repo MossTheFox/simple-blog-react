@@ -13,7 +13,7 @@ function ErrorBox({ retryFunc,
 
     return <Alert severity="error"
         variant="filled"
-        title="TESTAA" action={
+        action={
             retryFunc ?
                 <Button color="inherit" size="small" onClick={retryFunc}>{retryButtonText}</Button> : undefined
         }>
